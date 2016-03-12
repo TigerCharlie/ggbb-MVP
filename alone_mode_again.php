@@ -1,13 +1,44 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+
+include('includes/config.php');
+
+
+$is_gif = false;
+
+if(isset($_GET['uuid'])){
+        $uuid = $_GET['uuid'];
+
+        include('includes/db_connect.php');
+
+        $type = 'alone';
+        $reponse= $bdd->prepare('SELECT * FROM shoots WHERE uuid = :uuid AND active = 1 AND type = :type LIMIT 1');
+        $reponse->execute(array(
+            'uuid' => $uuid,
+            'type' => $type
+            ));
+
+        //var_dump($reponse);
+
+        if($reponse->rowCount() > 0){
+
+          $donnees = $reponse->fetch();
+
+          $gif_url = 'img/'.$donnees['uuid'].'.gif';
+
+          $is_gif = true;
+        }
+
+}
+
 ?>
 <!doctype html>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>Gif Gif Bang Bang !</title>
-        <meta name="description" content="Shoot gif with your friends and share !">
+        <title><?php echo 'alone again mode - '.GGBB_ON_TITLE; ?></title>
+        <meta name="description" content="<?php echo GGBB_DESCRIPTION; ?>">
         <meta name="viewport" content="width=device-width, initial-scale=1">
        
         <link rel="stylesheet" href="css/main.css?<?php echo date('l jS \of F Y h:i:s A'); ?>">
@@ -15,7 +46,7 @@ ini_set('display_errors', 1);
 
 
         <link rel="icon" type="image/png" href="asset/favicon.png" />
-        <meta name="apple-mobile-web-app-title" content="Gif Gif Bang Bang !">
+        <meta name="apple-mobile-web-app-title" content="<?php echo GGBB_ON_TITLE; ?>">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="mobile-web-app-capable" content="yes">
 
@@ -40,10 +71,10 @@ ini_set('display_errors', 1);
         <link rel="apple-touch-startup-image" media="(device-width: 320px)" href="asset/apple-touch-startup-image-320x460.png">
         <link rel="apple-touch-startup-image" media="(device-width: 320px) and (-webkit-device-pixel-ratio: 2)" href="asset/apple-touch-startup-image-640x920.png">
 
-        <meta property="og:site_name"   content="GifGifBangBang">
-        <meta property="og:url"         content="http://camponthemoon.com/bullet/">
-        <meta property="og:title"       content="Gif Gif Bang Bang !">
-        <meta property="og:description" content="<?php echo $gif_title; ?> - Shoot gif with your friends and share !">
+        <meta property="og:site_name"   content="<?php echo GGBB_SITE_NAME; ?>">
+        <meta property="og:url"         content="<?php echo $url_origin.'/'.$gif_url; ?>">
+        <meta property="og:title"       content="<?php echo 'alone again mode - '.GGBB_ON_TITLE; ?>">
+        <meta property="og:description" content="<?php if($is_gif){echo $donnees['title'];}else{echo 'You can\'t continue this gif !';} ?> - ">
 
         
     </head>
@@ -69,30 +100,11 @@ ini_set('display_errors', 1);
     </header>
     
     <?php
-      if(isset($_GET['uuid'])){
-        $uuid = $_GET['uuid'];
+      
+        if($is_gif){ 
 
-        include('includes/db_connect.php');
 
-        $type = 'alone';
-        $reponse= $bdd->prepare('SELECT * FROM shoots WHERE uuid = :uuid AND active = 1 AND type = :type LIMIT 1');
-        $reponse->execute(array(
-            'uuid' => $uuid,
-            'type' => $type
-            ));
-
-        //var_dump($reponse);
-
-        if($reponse->rowCount() > 0){
-
-          $donnees = $reponse->fetch();
-          /*
-          echo "<pre>";
-          echo $donnees['title'];
-          //var_dump($donnees[0]);
-          echo "</pre>";
-          */
-        ?>
+         ?>
 
 
 
@@ -122,17 +134,12 @@ ini_set('display_errors', 1);
       }else{
       ?>
 
-      <h1>You can't continue this Gif !</h1>
+      <h1>You can't continue this gif !</h1>
 
       <?php
       }
       ?>
-    
-    <?php
-      }
-    ?>
 
-      
     </div>  
     </body>
 

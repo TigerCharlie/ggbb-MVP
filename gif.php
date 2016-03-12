@@ -8,7 +8,6 @@ include('includes/config.php');
 
    include('includes/db_connect.php');
 
-
     if(isset($_GET['uuid'])){
 
      $uuid = $_GET['uuid']; 
@@ -36,10 +35,10 @@ include('includes/config.php');
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title><?php echo $gif_title; ?> - on GifGifBangBang !</title>
+        <title><?php echo $gif_title.' - '.GGBB_ON_TITLE; ?></title>
 
 
-        <meta name="description" content="Shoot and share gif with your friends on GifGifBangBang !">
+        <meta name="description" content="<?php echo GGBB_DESCRIPTION; ?>">
 
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="css/main.css?<?php echo date('l jS \of F Y h:i:s A'); ?>">
@@ -47,7 +46,7 @@ include('includes/config.php');
 
 
         <link rel="icon" type="image/png" href="asset/favicon.png" />
-        <meta name="apple-mobile-web-app-title" content="Gif Gif Bang Bang !">
+        <meta name="apple-mobile-web-app-title" content="<?php echo GGBB_TITLE; ?>">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="mobile-web-app-capable" content="yes">
 
@@ -75,26 +74,26 @@ include('includes/config.php');
 
         
 
-        <?php $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"; ?>
+        <?php $actual_link = $url_origin.''.$_SERVER['REQUEST_URI']; ?>
         <link rel="canonical" href="<?php echo $actual_link; ?>"/>
 
         <!--<meta property="fb:app_id"      content="406655189415060">-->
-        <meta property="og:site_name"   content="GifGifBangBang">
-        <meta property="og:url"         content="http://camponthemoon.com/bullet/<?php echo $gif_url; ?>">
-        <meta property="og:title"       content="<?php echo $gif_title; ?> - Shoot gif with your friends and share !">
-        <meta property="og:description" content="<?php echo $gif_title; ?> - Shoot gif with your friends and share !">
+        <meta property="og:site_name"   content="<?php echo GGBB_SITE_NAME; ?>">
+        <meta property="og:url"         content="<?php echo $url_origin.'/'.$gif_url; ?>">
+        <meta property="og:title"       content="<?php echo $gif_title.' - '.GGBB_ON_TITLE; ?>">
+        <meta property="og:description" content="<?php echo $gif_title.' - '.GGBB_DESCRIPTION; ?>">
 
         
         <meta property="og:type"        content="video.other">
-        <meta property="og:image"       content="http://camponthemoon.com/bullet/<?php echo $gif_url; ?>">
+        <meta property="og:image"       content="<?php echo $url_origin.'/'.$gif_url; ?>">
         <meta property="og:image:width"       content="400">
         <meta property="og:image:height"       content="400">
         
         <meta property="og:type"        content="video">
-        <meta property="og:image"       content="http://camponthemoon.com/bullet/<?php echo $jpg_url; ?>">
+        <meta property="og:image"       content="<?php echo $url_origin.'/'.$jpg_url; ?>">
         <meta property="og:image:width"       content="400">
         <meta property="og:image:height"      content="400">
-        <!--<meta property="og:video"                content="http://www.camponthemoon.com/bullet/share/media/o1s0vz.mp4">-->
+        <!--<meta property="og:video"                content="<?php echo $url_origin.'/video/'.$uuid.'mp4'; ?>">-->
 
         <meta property="og:video:type"        content="application/x-shockwave-flash">
         <meta property="og:video:width"       content="400">
@@ -102,28 +101,28 @@ include('includes/config.php');
 
         <!--<meta name="twitter:account_id" content="1020383864" />-->
         <meta name="twitter:card"           content="player">
-        <meta name="twitter:title"          content="<?php echo $gif_title; ?> - on GifGifBangBang !">
-        <meta name="twitter:creator"        content="@gifgifbangbang">
-        <meta name="twitter:site"           content="@gifgifbangbang">
-        <meta name="twitter:description"    content="Shoot and share gif with your friends on GifGifBangBang !">
-        <meta name="twitter:image:src"      content="http://camponthemoon.com/bullet/<?php echo $jpg_url; ?>">
-        <meta name="twitter:image"          content="http://camponthemoon.com/bullet/<?php echo $jpg_url; ?>">
-        <meta name="twitter:domain"         content="camponthemoon.com">
+        <meta name="twitter:title"          content="<?php echo GGBB_DESCRIPTION; ?>">
+        <meta name="twitter:creator"        content="<?php echo GGBB_SITE_ORIGIN; ?>">
+        <meta name="twitter:site"           content="<?php echo GGBB_SITE_ORIGIN; ?>">
+        <meta name="twitter:description"    content="<?php echo $gif_title.' - '.GGBB_DESCRIPTION; ?>">
+        <meta name="twitter:image:src"      content="<?php echo $url_origin.'/'.$jpg_url; ?>">
+        <meta name="twitter:image"          content="<?php echo $url_origin.'/'.$jpg_url; ?>">
+        <meta name="twitter:domain"         content="<?php echo GGBB_DOMAIN; ?>">
 
         
-        <meta name="twitter:player"         content="http://camponthemoon.com/bullet/">
+        <meta name="twitter:player"         content="<?php echo $url_origin.'/embed.php?uuid='.$uuid; ?>">
         <meta name="twitter:player:width"   content="400">
         <meta name="twitter:player:height"  content="400">
         
         <!-- /twitter seo -->
 
 
-        <meta name="description" content="<?php echo $gif_title; ?> - Shoot and share gif with your friends on GifGifBangBang !"/>
-        <meta name="author" content="GifGifBangBang"/>
-        <meta name="keywords" content="<?php echo $gif_title; ?>, Shoot, Bang, Gif, Animated GIF">
+        <meta name="description" content="<?php echo $gif_title; ?> - <?php echo GGBB_DESCRIPTION; ?>"/>
+        <meta name="author" content="<?php echo GGBB_SITE_NAME; ?>"/>
+        <meta name="keywords" content="<?php echo $gif_title; ?>, <?php echo GGBB_KEYWORDS; ?>">
         <meta name="pinterest" content="nohover">
         
-        <link rel="alternate" type="application/json+oembed" href="http://camponthemoon.com/bullet/json.php?uuid=<?php echo $uuid; ?>" title="Jeremie" />
+        <link rel="alternate" type="application/json+oembed" href="<?php echo $url_origin.'/json.php?uuid='.$uuid; ?>" title="<?php echo GGBB_SITE_NAME; ?>" />
         
     </head>
     <body>
@@ -154,7 +153,7 @@ include('includes/config.php');
         <a class="google-share" href="https://plus.google.com/share?url=<?php echo $actual_link; ?>" target="_blank">Share on Google+</a>
         <section class="form-block">
             <div><label for="iframe-embed-code">Iframe Embed</label></div>
-            <div class="full-width"><input onClick="this.setSelectionRange(0, this.value.length)" type="text" class="form-control" id="iframe-embed-code" spellcheck="false" readonly="true" value="<iframe src=&quot;//camponthemoon.com/bullet/embed.php?uuid=<?php echo $uuid; ?>&quot; width=&quot;400&quot; height=&quot;400&quot; frameBorder=&quot;0&quot; class=&quot;gifgifbangbang-embed&quot; allowFullScreen></iframe><p><a href=&quot;http://camponthemoon.com/bullet/gif.php?uuid=<?php echo $uuid; ?>&quot;>via GifGifBangBang</a></p>"></div>
+            <div class="full-width"><input onClick="this.setSelectionRange(0, this.value.length)" type="text" class="form-control" id="iframe-embed-code" spellcheck="false" readonly="true" value="<iframe src=&quot;//<?php echo GGBB_DOMAIN; ?>/embed.php?uuid=<?php echo $uuid; ?>&quot; width=&quot;400&quot; height=&quot;400&quot; frameBorder=&quot;0&quot; class=&quot;gifgifbangbang-embed&quot; allowFullScreen></iframe><p><a href=&quot;<?php echo $url_origin.'/gif.php?uuid='.$uuid; ?>&quot;>via GifGifBangBang</a></p>"></div>
         </section>
     </div>
 

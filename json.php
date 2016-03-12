@@ -7,7 +7,7 @@ include('includes/config.php');
 
 header('Content-Type: application/json; charset=utf-8');
     
-    $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+    $actual_link = $url_origin.''.$_SERVER['REQUEST_URI'];
 
     include('includes/db_connect.php');
 
@@ -36,13 +36,13 @@ header('Content-Type: application/json; charset=utf-8');
 
             $json_content .= '{';
             $json_content .= '"width": 400,';
-            $json_content .= '"author_url": "http://camponthemoon.com/",';
+            $json_content .= '"author_url": "'.$url_origin.'",';
             $json_content .= '"title": "'.$gif_title.' - on GifGifBangBang !",';
-            $json_content .= '"url": "http://camponthemoon.com/bullet/",';
-            $json_content .= '"image": "http://camponthemoon.com/bullet/'.$gif_url.'",';
-            $json_content .= '"provider_url": "http://camponthemoon.com/",';
-            $json_content .= '"provider_name": "GifGifBangBang",';
-            $json_content .= '"author_name": "GifGifBangBang",';
+            $json_content .= '"url": "'.$url_origin.'",';
+            $json_content .= '"image": "'.$url_origin.'/'.$gif_url.'",';
+            $json_content .= '"provider_url": "'.$url_origin.'",';
+            $json_content .= '"provider_name": "'.GGBB_SITE_NAME.'",';
+            $json_content .= '"author_name": "'.GGBB_SITE_NAME.'",';
             $json_content .= '"height": 400';
             $json_content .= '}';
 

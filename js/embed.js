@@ -8,6 +8,11 @@
 window.onload = function()
   {
 
+  var url = window.location.href
+  var urlArr = url.split("/");
+  var baseUrl = urlArr[0] + "//" + urlArr[2];
+  var baseUrlWithoutHttp = "//" + urlArr[2];
+
   var resizeTimeout;
   var gifContainer = document.getElementById('embed');
 
@@ -105,12 +110,12 @@ var gifUUID = document.getElementById('gif-img').getAttribute('data-uuid');
 
 var embedContent = '<section class="form-block last">';
 embedContent += '<div><label for="iframe-embed-code">Iframe Embed</label></div>';
-embedContent += '<div class="full-width"><input onClick="this.setSelectionRange(0, this.value.length)" id="iframe-embed-code" class="form-control" type="text" value="<iframe src=&quot;//camponthemoon.com/bullet/embed.php?uuid='+gifUUID+'&quot; width=&quot;400&quot; height=&quot;400&quot; frameBorder=&quot;0&quot; class=&quot;gifgifbangbang-embed&quot; allowFullScreen></iframe><p><a href=&quot;http://camponthemoon.com/bullet/gif.php?uuid='+gifUUID+'&quot;>via GifGifBangBang</a></p>" readonly="true" spellcheck="false"></div>';
+embedContent += '<div class="full-width"><input onClick="this.setSelectionRange(0, this.value.length)" id="iframe-embed-code" class="form-control" type="text" value="<iframe src=&quot;'+baseUrlWithoutHttp+'/embed.php?uuid='+gifUUID+'&quot; width=&quot;400&quot; height=&quot;400&quot; frameBorder=&quot;0&quot; class=&quot;gifgifbangbang-embed&quot; allowFullScreen></iframe><p><a href=&quot;'+baseUrl+'/gif.php?uuid='+gifUUID+'&quot;>via GifGifBangBang</a></p>" readonly="true" spellcheck="false"></div>';
 embedContent += '</section>';
 
 var linkContent = '<section class="form-block last">';
 linkContent += '<div><label for="link-code">Link</label></div>';
-linkContent += '<div class="full-width"><input onClick="this.setSelectionRange(0, this.value.length)" id="link-code" class="form-control" type="text" value="http://camponthemoon.com/bullet/gif.php?uuid='+gifUUID+'" readonly="true" spellcheck="false"></div>';
+linkContent += '<div class="full-width"><input onClick="this.setSelectionRange(0, this.value.length)" id="link-code" class="form-control" type="text" value="'+baseUrl+'/gif.php?uuid='+gifUUID+'" readonly="true" spellcheck="false"></div>';
 linkContent += '</section>';
 
 

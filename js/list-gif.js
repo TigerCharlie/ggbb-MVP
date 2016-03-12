@@ -1,5 +1,5 @@
 /* main.js
- * Bullet 
+ * GifGifBangBang
  * V 0.1
  * Jérémie Bersani
  *

@@ -7,8 +7,8 @@ include('includes/config.php'); ?>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>Gif Gif Bang Bang !</title>
-        <meta name="description" content="Shoot gif with your friends and share !">
+        <title><?php echo 'Together mode - '.GGBB_ON_TITLE; ?></title>
+        <meta name="description" content="<?php echo GGBB_DESCRIPTION; ?>">
         <meta name="viewport" content="width=device-width, initial-scale=1">
        
         <link rel="stylesheet" href="css/main.css?<?php echo date('l jS \of F Y h:i:s A'); ?>">
@@ -16,7 +16,7 @@ include('includes/config.php'); ?>
 
 
         <link rel="icon" type="image/png" href="asset/favicon.png" />
-        <meta name="apple-mobile-web-app-title" content="Gif Gif Bang Bang !">
+        <meta name="apple-mobile-web-app-title" content="<?php echo GGBB_ON_TITLE; ?>">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="mobile-web-app-capable" content="yes">
 
@@ -42,10 +42,10 @@ include('includes/config.php'); ?>
         <link rel="apple-touch-startup-image" media="(device-width: 320px) and (-webkit-device-pixel-ratio: 2)" href="asset/apple-touch-startup-image-640x920.png">
 
 
-        <meta property="og:site_name"   content="GifGifBangBang">
-        <meta property="og:url"         content="http://camponthemoon.com/bullet/">
-        <meta property="og:title"       content="Gif Gif Bang Bang !">
-        <meta property="og:description" content="<?php echo $gif_title; ?> - Shoot gif with your friends and share !">
+        <meta property="og:site_name"   content="<?php echo GGBB_ON_TITLE; ?>">
+        <meta property="og:url"         content="<?php echo $url_origin.'/together_mode.php'; ?>">
+        <meta property="og:title"       content="<?php echo 'Together mode - '.GGBB_ON_TITLE; ?>">
+        <meta property="og:description" content="<?php echo 'Shoot gif with your friends and share !'; ?>">
 
         
     </head>

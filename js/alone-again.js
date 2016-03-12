@@ -1,5 +1,5 @@
 /* main.js
- * Bullet 
+ * GifGifBangBang
  * V 0.1
  * Jérémie Bersani
  *
@@ -7,6 +7,13 @@
 
 window.onload = function()
   {
+
+  var url = window.location.href
+  var urlArr = url.split("/");
+  var baseUrl = urlArr[0] + "//" + urlArr[2];
+
+
+
 
   var shootTitle = '';
   var shootId = '';
@@ -367,9 +374,9 @@ window.onload = function()
     showAlertMessage(true,'YEAAAAH !');
 
 
-    var htmlContent = '<div class="share-btn"><a class="facebook-share" href="https://www.facebook.com/sharer.php?u=http://www.camponthemoon.com/bullet/gif.php?uuid='+shootId+'" target="_blank">Share on facebook</a>';
-    htmlContent += '<a class="twitter-share" href="https://twitter.com/intent/tweet?url=http://www.camponthemoon.com/bullet/gif.php?uuid='+shootId+'" target="_blank">Share on Twitter</a>';
-    htmlContent += '<a class="google-share" href="https://plus.google.com/share?url=http://www.camponthemoon.com/bullet/gif.php?uuid='+shootId+'" target="_blank">Share on Google+</a></div>';
+    var htmlContent = '<div class="share-btn"><a class="facebook-share" href="https://www.facebook.com/sharer.php?u='+baseUrl+'/gif.php?uuid='+shootId+'" target="_blank">Share on facebook</a>';
+    htmlContent += '<a class="twitter-share" href="https://twitter.com/intent/tweet?url='+baseUrl+'/gif.php?uuid='+shootId+'" target="_blank">Share on Twitter</a>';
+    htmlContent += '<a class="google-share" href="https://plus.google.com/share?url='+baseUrl+'/gif.php?uuid='+shootId+'" target="_blank">Share on Google+</a></div>';
 
 
     htmlContent += '<button  class="btn" type="button" id="buttonAnotherShoot" >Make another Shoot !</button>';
