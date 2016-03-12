@@ -1,3 +1,8 @@
+<?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+include('includes/config.php'); ?>
 <!doctype html>
     <head>
         <meta charset="utf-8">
@@ -58,7 +63,7 @@
       </ul>
     </nav>
 
-        <a href="http://www.camponthemoon.com/bullet"><img class="logo" src="asset/gifgifbangbang.gif"></a>
+        <a href="<?php echo GGBB_URL;?>"><img class="logo" src="asset/gifgifbangbang.gif"></a>
     </header>
       
       <div id="shot-box" class="shot-box">

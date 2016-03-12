@@ -2,6 +2,8 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+include('includes/config.php');
+
     $gif_per_page = 5;
 
     if(isset($_GET['page'])){
@@ -55,7 +57,7 @@ ini_set('display_errors', 1);
         <meta property="og:site_name"   content="GifGifBangBang">
         <meta property="og:url"         content="http://camponthemoon.com/bullet/">
         <meta property="og:title"       content="Gif Gif Bang Bang !">
-        <meta property="og:description" content="<?php echo $gif_title; ?> - Shoot gif with your friends and share !">
+        <meta property="og:description" content="My gifs">
         
     </head>
     <body>
@@ -71,20 +73,13 @@ ini_set('display_errors', 1);
         <li><a href="gifs_list.php">All Gifs</a></li>
       </ul>
     </nav>
-        <a href="http://www.camponthemoon.com/bullet"><img class="logo" src="asset/gifgifbangbang.gif"></a>
+        <a href="<?php echo GGBB_URL;?>"><img class="logo" src="asset/gifgifbangbang.gif"></a>
     </header>
       
     <h1>Gif list</h1>
     <ul class="gif_list">
     <?php
-    try
-    {
-      $bdd = new PDO('mysql:host=camponthesbullet.mysql.db;dbname=camponthesbullet;charset=utf8', 'camponthesbullet', '7mnm9HSEvX49');
-    }
-    catch(Exception $e)
-    {
-        die('Erreur : '.$e->getMessage());
-    }
+    include('includes/db_connect.php');
 
     $reponse= $bdd->prepare('SELECT * FROM shoots WHERE gif_done = :gif_done AND active=1 ORDER BY timer DESC LIMIT '.$gif_per_page.' OFFSET '.$offset);
     $reponse->execute(array(

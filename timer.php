@@ -1,14 +1,13 @@
 <?php
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+include('includes/config.php');
+
 header('Content-Type: application/json; charset=utf-8');
 
-try
-{
-	$bdd = new PDO('mysql:host=camponthesbullet.mysql.db;dbname=camponthesbullet;charset=utf8', 'camponthesbullet', '7mnm9HSEvX49');
-}
-catch(Exception $e)
-{
-    die('Erreur : '.$e->getMessage());
-}
+include('includes/db_connect.php');
 
 if(isset($_POST['uuid'])){
 	$uuid = $_POST['uuid'];

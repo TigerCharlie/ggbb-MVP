@@ -65,22 +65,14 @@ ini_set('display_errors', 1);
       </ul>
     </nav>
 
-        <a href="http://www.camponthemoon.com/bullet"><img class="logo" src="asset/gifgifbangbang.gif"></a>
+        <a href="<?php echo GGBB_URL;?>"><img class="logo" src="asset/gifgifbangbang.gif"></a>
     </header>
     
     <?php
       if(isset($_GET['uuid'])){
         $uuid = $_GET['uuid'];
 
-
-        try
-        {
-          $bdd = new PDO('mysql:host=camponthesbullet.mysql.db;dbname=camponthesbullet;charset=utf8', 'camponthesbullet', '7mnm9HSEvX49');
-        }
-        catch(Exception $e)
-        {
-            die('Erreur : '.$e->getMessage());
-        }
+        include('includes/db_connect.php');
 
         $type = 'alone';
         $reponse= $bdd->prepare('SELECT * FROM shoots WHERE uuid = :uuid AND active = 1 AND type = :type LIMIT 1');

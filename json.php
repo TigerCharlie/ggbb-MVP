@@ -1,16 +1,15 @@
 <?php
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+include('includes/config.php');
+
 header('Content-Type: application/json; charset=utf-8');
     
     $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
-    try
-    {
-      $bdd = new PDO('mysql:host=camponthesbullet.mysql.db;dbname=camponthesbullet;charset=utf8', 'camponthesbullet', '7mnm9HSEvX49');
-    }
-    catch(Exception $e)
-    {
-        die('Erreur : '.$e->getMessage());
-    }
+    include('includes/db_connect.php');
 
 
     if(isset($_GET['uuid'])){

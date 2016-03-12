@@ -1,4 +1,10 @@
 <?php
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+include('includes/config.php');
+
 if(isset($_FILES['file']) and !$_FILES['file']['error']){
 
 	if( isset($_POST['uuid']) && isset($_POST['frame']) ){
@@ -18,14 +24,7 @@ if(isset($_FILES['file']) and !$_FILES['file']['error']){
 		  //echo "Successfully uploaded";
 		  //echo '{"status_code":1,"status":"image saved"}';
 
-		  try
-			{
-				$bdd = new PDO('mysql:host=camponthesbullet.mysql.db;dbname=camponthesbullet;charset=utf8', 'camponthesbullet', '7mnm9HSEvX49');
-			}
-			catch(Exception $e)
-			{
-			    die('Erreur : '.$e->getMessage());
-			}
+		  include('includes/db_connect.php');
 
 			$reponse= $bdd->prepare('SELECT * FROM shoots WHERE uuid = :uuid AND active=1 LIMIT 1');
 			$reponse->execute(array(

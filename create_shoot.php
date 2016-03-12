@@ -1,16 +1,11 @@
 <?php
 
-ini_set ("display_errors", "1");
 error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-try
-{
-	$bdd = new PDO('mysql:host=camponthesbullet.mysql.db;dbname=camponthesbullet;charset=utf8', 'camponthesbullet', '7mnm9HSEvX49');
-}
-catch(Exception $e)
-{
-    die('Erreur : '.$e->getMessage());
-}
+include('includes/config.php');
+
+include('includes/db_connect.php');
 
 
 if(isset($_POST['title'])){

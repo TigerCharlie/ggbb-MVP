@@ -1,14 +1,12 @@
 <!doctype html>
 <?php
 
-    try
-    {
-      $bdd = new PDO('mysql:host=camponthesbullet.mysql.db;dbname=camponthesbullet;charset=utf8', 'camponthesbullet', '7mnm9HSEvX49');
-    }
-    catch(Exception $e)
-    {
-        die('Erreur : '.$e->getMessage());
-    }
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+include('includes/config.php');
+
+   include('includes/db_connect.php');
 
 
     if(isset($_GET['uuid'])){
@@ -141,7 +139,7 @@
         <li><a href="gifs_list.php">All Gifs</a></li>
       </ul>
     </nav>
-        <a href="http://www.camponthemoon.com/bullet"><img class="logo" src="asset/gifgifbangbang.gif"></a>
+        <a href="<?php echo GGBB_URL;?>"><img class="logo" src="asset/gifgifbangbang.gif"></a>
     </header>
     <h1><?php echo $gif_title; ?></h1>
     <ul class="gif_list margin-bottom">

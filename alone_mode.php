@@ -1,3 +1,9 @@
+<?php
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+include('includes/config.php'); ?>
 <!doctype html>
     <head>
         <meta charset="utf-8">
@@ -39,7 +45,7 @@
         <meta property="og:site_name"   content="GifGifBangBang">
         <meta property="og:url"         content="http://camponthemoon.com/bullet/">
         <meta property="og:title"       content="Gif Gif Bang Bang !">
-        <meta property="og:description" content="<?php echo $gif_title; ?> - Shoot gif with your friends and share !">
+        <meta property="og:description" content="Shoot gif alone and share !">
 
         
     </head>
@@ -57,7 +63,7 @@
       </ul>
     </nav>
 
-        <a href="http://www.camponthemoon.com/bullet"><img class="logo" src="asset/gifgifbangbang.gif"></a>
+        <a href="<?php echo GGBB_URL;?>"><img class="logo" src="asset/gifgifbangbang.gif"></a>
     </header>
       
       <div id="shot-box" class="shot-box">
@@ -80,5 +86,4 @@
       ?>
     </div>  
     </body>
-
 </html>
