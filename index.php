@@ -69,11 +69,10 @@ include('includes/config.php'); ?>
       
       
     <h1>You want to shoot gif :</h1>
-    <ul>
-      <li><a href="together_mode.php">with your friends ?</a></li>
-      <li><a href="alone_mode.php">Alone ?</a></li>
-    </ul>
-
+        <ul>
+          <li><a class="btn center" href="together_mode.php">with your friends ?</a></li>
+          <li><a class="btn center margin-bottom" href="alone_mode.php">Alone ?</a></li>
+        </ul>  
     </div>  
     </body>
 
