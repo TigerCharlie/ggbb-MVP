@@ -4,7 +4,6 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include('includes/config.php');
-
 include('includes/db_connect.php');
 
 
@@ -64,7 +63,10 @@ if(isset($_POST['title'])){
 		'active' => $active,
 		'uploaded_frames' => $uploaded_frames
 		))) {
-    		echo '{"status_code":-1,"status":"mysql execute error"}';
+    		//echo '{"status_code":-1,"status":"mysql execute error"}';
+    		
+    		echo mysql_error();
+
     		//die(mysql_error());
 		} else{	
 
