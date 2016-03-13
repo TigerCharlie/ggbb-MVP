@@ -77,7 +77,7 @@ include('includes/config.php'); ?>
 
 
       <div id="form-container">
-        <input  class="btn" type="button" id="buttonPlay" value="Start Now !"/>
+        <button class="btn" type="button" id="buttonPlay">Start Now !</button>
       </div>
       <?php 
       if(isset($_GET['debug'])) {
