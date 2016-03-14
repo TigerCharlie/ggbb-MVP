@@ -738,7 +738,7 @@ function createShoot(){
     video.onerror = function ()
     {
       log('video.onerror');
-      if (video) stop();
+      //if (video) stop();
     };
     stream.onended = noStream;
     if (window.webkitURL) video.src = window.webkitURL.createObjectURL(stream);
@@ -784,7 +784,7 @@ function createShoot(){
     window.stream = stream; // make stream available to console
     video.src = window.URL.createObjectURL(stream);
     video.play();
-
+    
     log('successCallback');
   }
 
@@ -797,10 +797,10 @@ function createShoot(){
     if (video.paused) {
       log('Video is not Playing');
       return false;
-    }else {
+    }else { 
       log('Video is Playing');
       return true;
-    }
+    } 
   }
 
   function showHidePlayButton(video) {
@@ -863,19 +863,12 @@ function createShoot(){
         if (typeof(videoSelect) != 'undefined' && videoSelect != null)
         {
 
-        }else{
+        }else{ 
 
-          /*videoParameters.innerHTML = '<select class="select nomargin camera-switch" id="videoSource"></select>';
+          videoParameters.innerHTML = '<select class="select nomargin camera-switch" id="videoSource"></select>';
           videoSelect = document.getElementById('videoSource');
           videoSelect.onchange = startStream;
-          MediaStreamTrack.getSources(gotSources);*/
-
-          videoParameters.innerHTML = '<button class="btn nomargin camera-switch" type="button" id="buttonChange" >Change camera</button>';
-          var buttonChange = document.getElementById('buttonChange');
-          buttonChange.addEventListener("click", function(event){ event.preventDefault();  changeStream(); });
-
-
-
+          MediaStreamTrack.getSources(gotSources);
         }
       }
 
