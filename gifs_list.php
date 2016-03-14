@@ -119,7 +119,7 @@ include('includes/config.php');
         $pagination_list='';
 
         if($page>3){
-            $pagination_list .= '<li><a href="'.$url_origin.'/giflist.php?page=1">1</a></li>';
+            $pagination_list .= '<li><a href="'.$url_origin.'/gifs_list.php?page=1">1</a></li>';
             if($page>4){
                 $pagination_list .= '<li class="inter">...</li>';
             }
@@ -135,7 +135,7 @@ include('includes/config.php');
             if($i == $page){
                 $pagination_list .= '<li class="active">'.$i.'</li>';
             }else{
-                $pagination_list .= '<li><a href="'.$url_origin.'/giflist.php?page='.$i.'">'.$i.'</a></li>';
+                $pagination_list .= '<li><a href="'.$url_origin.'/gifs_list.php?page='.$i.'">'.$i.'</a></li>';
             }
             
         }
@@ -144,7 +144,7 @@ include('includes/config.php');
             if($page<$page_max-2){
                 $pagination_list .= '<li class="inter">...</li>';
             }
-            $pagination_list .= '<li><a href="'.$url_origin.'/giflist.php?page='.$page_max.'">'.$page_max.'</a></li>';
+            $pagination_list .= '<li><a href="'.$url_origin.'/gifs_list.php?page='.$page_max.'">'.$page_max.'</a></li>';
         }
 
         echo '<div class="center pagination-container"><ul class="pagination">'.$pagination_list.'</ul></div>';
