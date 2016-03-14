@@ -75,6 +75,20 @@ window.onload = function()
 
   function afterResize() {
     log('after resize');
+
+    var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
+    var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+
+    if(w>h){
+
+      var RotateScreenAlert = '<p>Please Rotate screen !</p>'
+      openLightBox(RotateScreenAlert);
+
+    }else{
+      closeLightBox();
+    }
+
+
     var video = document.getElementById('video');
     if(video){
       resizeVideo();
@@ -144,7 +158,6 @@ window.onload = function()
   }
 
   function RefreshGif(){
-
     var finalGif = document.getElementById('finalGif');
     var previousGifSrc = finalGif.src;
     if(previousGifSrc.indexOf('?')>0){
@@ -899,5 +912,49 @@ function createShoot(){
   }
 
   startStream();
+
+
+
+  function openLightBox(content)
+  {
+
+    console.log('openLightBox'+ content);
+
+    var lightBox = document.getElementById('light-box');
+
+    if(!lightBox){
+      var lightBoxContent = '<a id="box-close-btn" href="#">Close</a>';
+      lightBoxContent += '<div id="light-box" class="white-content">';
+      lightBoxContent += '<div id="box-content" class="box-content">';
+      lightBoxContent += '</div></div>';
+      lightBoxContent += '<div id="black-overlay" class="black-overlay"></div>';
+      //document.body.innerHTML += lightBoxContent;
+      document.body.insertAdjacentHTML( 'beforeend', lightBoxContent);
+
+      var closeBtn = document.getElementById('box-close-btn');
+      if(closeBtn){
+        closeBtn.addEventListener("click", function(event){ event.preventDefault();  closeLightBox(); });
+      }
+
+    }
+
+    if(content){
+      document.getElementById('box-content').innerHTML = content;
+      document.getElementById('light-box').style.display = 'block';
+      document.getElementById('black-overlay').style.display = 'block';
+      document.getElementById('box-close-btn').style.display = 'block';
+
+    }
+    
+  }
+
+  function closeLightBox()
+  {
+      console.log('closeLightBox');
+      document.getElementById('light-box').style.display = 'none';
+      document.getElementById('black-overlay').style.display = 'none';
+      document.getElementById('box-close-btn').style.display = 'none';
+    
+  }
 
 }
