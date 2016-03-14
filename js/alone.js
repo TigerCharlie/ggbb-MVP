@@ -738,7 +738,7 @@ function createShoot(){
     video.onerror = function ()
     {
       log('video.onerror');
-      if (video) stop();
+      //if (video) stop();
     };
     stream.onended = noStream;
     if (window.webkitURL) video.src = window.webkitURL.createObjectURL(stream);
