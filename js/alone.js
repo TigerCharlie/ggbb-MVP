@@ -26,6 +26,9 @@ window.onload = function()
   var checkShootTimeout;
   var checkGifTimeout;
 
+
+  
+
   //var gifFramesList = [];
 
   var gifFrames = 0;
@@ -82,7 +85,7 @@ window.onload = function()
     if(w>h){
 
       var RotateScreenAlert = '<p>Please Rotate screen !</p>'
-      openLightBox(RotateScreenAlert);
+      //openLightBox(RotateScreenAlert);
 
     }else{
       closeLightBox();
@@ -113,7 +116,7 @@ window.onload = function()
   navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
 
   // enable getUserMedia
-  navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+  //navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
   // dataURL to Blob
   function dataURLToBlob(dataURL) {
@@ -825,9 +828,85 @@ function createShoot(){
     }
   }
 
+  function errorCallback(e) {
+    log(e);
+  }
 
 
-  function startStream()
+  function gotDevices(deviceInfos) {
+
+    for (var i = 0; i !== deviceInfos.length; ++i) {
+      var deviceInfo = deviceInfos[i];
+      var option = document.createElement('option');
+      option.value = deviceInfo.deviceId;
+      if (deviceInfo.kind === 'audioinput') {
+        option.text = deviceInfo.label ||
+          'Microphone ' + (audioInputSelect.length + 1);
+        audioInputSelect.appendChild(option);
+      } else if (deviceInfo.kind === 'audiooutput') {
+        option.text = deviceInfo.label || 'Speaker ' +
+          (audioOutputSelect.length + 1);
+        audioOutputSelect.appendChild(option);
+      } else if (deviceInfo.kind === 'videoinput') {
+        option.text = deviceInfo.label || 'Camera ' +
+          (videoSelect.length + 1);
+        videoSelect.appendChild(option);
+      }
+
+    }
+
+  }
+  /////////////////////////////////////////////////
+
+  var promisifiedOldGUM = function(constraints, successCallback, errorCallback) {
+
+    // First get ahold of getUserMedia, if present
+    var getUserMedia = (navigator.getUserMedia ||
+        navigator.webkitGetUserMedia ||
+        navigator.mozGetUserMedia);
+
+    // Some browsers just don't implement it - return a rejected promise with an error
+    // to keep a consistent interface
+    if(!getUserMedia) {
+      return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+    }
+
+    // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
+    return new Promise(function(successCallback, errorCallback) {
+      getUserMedia.call(navigator, constraints, successCallback, errorCallback);
+    });
+    
+  }
+
+  // Older browsers might not implement mediaDevices at all, so we set an empty object first
+  if(navigator.mediaDevices === undefined) {
+    navigator.mediaDevices = {};
+  }
+
+  // Some browsers partially implement mediaDevices. We can't just assign an object
+  // with getUserMedia as it would overwrite existing properties.
+  // Here, we will just add the getUserMedia property if it's missing.
+  if(navigator.mediaDevices.getUserMedia === undefined) {
+    navigator.mediaDevices.getUserMedia = promisifiedOldGUM;
+  }
+
+
+  ///////////////////////////////////////////////////
+
+
+  // enable vibration support
+  //navigator.mediaDevices.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
+
+  //navigator.getUserMedia = ( navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+
+  /*
+  var constraints = window.constraints = {
+  audio: false,
+  video: { width: 400, height: 400 }
+  };
+  */
+
+  function startWebCamStream()
   {
 
 
@@ -838,11 +917,64 @@ function createShoot(){
       buttonPlay.style.display = "none";
     }
 
+
+    var p = navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+
+    p.then(function(mediaStream) {
+      //var video = document.querySelector('video');
+      video.src = window.URL.createObjectURL(mediaStream);
+      video.onloadedmetadata = function(e) {
+        // Do something with the video here.
+      };
+    });
+
+
+
+    /*
+    navigator.mediaDevices.getUserMedia(constraints)
+    .then(function(stream) {
+      var videoTracks = stream.getVideoTracks();
+      log('Got stream with constraints:', constraints);
+      log('Using video device: ' + videoTracks[0].label);
+      stream.onended = function() {
+        log('Stream ended');
+      };
+      window.stream = stream; // make variable available to browser console
+      video.srcObject = stream;
+    })
+    .catch(function(error) {
+      if (error.name === 'ConstraintNotSatisfiedError') {
+        log('The resolution ' + constraints.video.width.exact + 'x' +
+            constraints.video.width.exact + ' px is not supported by your device.');
+      } else if (error.name === 'PermissionDeniedError') {
+        log('Permissions have not been granted to use your camera and ' +
+          'microphone, you need to allow the page access to your devices in ' +
+          'order for the demo to work.');
+      }
+      log('getUserMedia error: ' + error.name, error);
+    });
+
+    */
+
+
+
+
+
+
+
+    /*
     if (!navigator.getUserMedia) {
           log('getUserMedia not supported');
           showAlertMessage(false,'Your Browser is not cool enough to run this site please use Chrome, Firefox or Opera.');
     } else {
 
+
+      navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(errorCallback);
+
+
+
+
+      
       if (typeof MediaStreamTrack === 'undefined' || typeof MediaStreamTrack.getSources === 'undefined') {
         //alert('This browser does not support MediaStreamTrack.\n\nTry Chrome.');
         log('This browser does not support MediaStreamTrack.');
@@ -907,13 +1039,13 @@ function createShoot(){
 
         navigator.getUserMedia(constraints, successCallback, errorCallback);
       } 
-        
-    }  
+       
+    }  */
   }
 
-  startStream();
+  startWebCamStream();
 
-
+/*
 
   function openLightBox(content)
   {
@@ -956,5 +1088,5 @@ function createShoot(){
       document.getElementById('box-close-btn').style.display = 'none';
     
   }
-
+*/
 }
