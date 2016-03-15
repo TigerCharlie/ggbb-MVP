@@ -918,7 +918,7 @@ function createShoot(){
     }
 
 
-    var p = navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+    var p = navigator.mediaDevices.getUserMedia({ audio: false, video: { width: 400, height: 400 } });
 
     p.then(function(mediaStream) {
       //var video = document.querySelector('video');
