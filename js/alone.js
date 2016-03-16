@@ -26,7 +26,7 @@ window.onload = function()
   var checkShootTimeout;
   var checkGifTimeout;
 
-
+  var localStream;
   
 
   //var gifFramesList = [];
@@ -88,7 +88,7 @@ window.onload = function()
       //openLightBox(RotateScreenAlert);
 
     }else{
-      closeLightBox();
+      //closeLightBox();
     }
 
 
@@ -785,6 +785,7 @@ function createShoot(){
   function successCallback(stream) {
     gotStream(stream);
     window.stream = stream; // make stream available to console
+    localStream = stream;
     video.src = window.URL.createObjectURL(stream);
     video.play();
     
@@ -858,6 +859,7 @@ function createShoot(){
   }
   /////////////////////////////////////////////////
 
+  /*
   var promisifiedOldGUM = function(constraints, successCallback, errorCallback) {
 
     // First get ahold of getUserMedia, if present
@@ -889,7 +891,7 @@ function createShoot(){
   if(navigator.mediaDevices.getUserMedia === undefined) {
     navigator.mediaDevices.getUserMedia = promisifiedOldGUM;
   }
-
+  */
 
   ///////////////////////////////////////////////////
 
@@ -897,7 +899,7 @@ function createShoot(){
   // enable vibration support
   //navigator.mediaDevices.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
 
-  //navigator.getUserMedia = ( navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+  navigator.getUserMedia = ( navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
 
   /*
   var constraints = window.constraints = {
@@ -908,8 +910,6 @@ function createShoot(){
 
   function startWebCamStream()
   {
-
-
     buttonPlay = document.getElementById('buttonPlay');
 
     if(buttonPlay){
@@ -917,7 +917,7 @@ function createShoot(){
       buttonPlay.style.display = "none";
     }
 
-
+    /*
     var p = navigator.mediaDevices.getUserMedia({ audio: false, video: { width: 400, height: 400 } });
 
     p.then(function(mediaStream) {
@@ -928,7 +928,7 @@ function createShoot(){
       };
     });
 
-
+    */
 
     /*
     navigator.mediaDevices.getUserMedia(constraints)
@@ -962,16 +962,14 @@ function createShoot(){
 
 
 
-    /*
+    
     if (!navigator.getUserMedia) {
           log('getUserMedia not supported');
           showAlertMessage(false,'Your Browser is not cool enough to run this site please use Chrome, Firefox or Opera.');
     } else {
 
 
-      navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(errorCallback);
-
-
+      //navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(errorCallback);
 
 
       
@@ -999,7 +997,7 @@ function createShoot(){
 
           videoParameters.innerHTML = '<select class="select nomargin camera-switch" id="videoSource"></select>';
           videoSelect = document.getElementById('videoSource');
-          videoSelect.onchange = startStream;
+          videoSelect.onchange = startWebCamStream;
           MediaStreamTrack.getSources(gotSources);
         }
       }
@@ -1010,9 +1008,10 @@ function createShoot(){
       else
       {
 
-        if (window.stream) {
+        if (localStream) {
           video.src = null;
-          window.stream.stop();
+          //localStream.stop();
+          localStream.getVideoTracks()[0].stop();
         }
 
         if (typeof(videoSelect) != 'undefined' && videoSelect != null)
@@ -1040,7 +1039,7 @@ function createShoot(){
         navigator.getUserMedia(constraints, successCallback, errorCallback);
       } 
        
-    }  */
+    }  
   }
 
   startWebCamStream();

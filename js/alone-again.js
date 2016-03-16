@@ -30,6 +30,8 @@ window.onload = function()
   var checkShootTimeout;
   var checkGifTimeout;
 
+  var localStream;
+
   //var gifFramesList = [];
 
   var gifFrames = 0;
@@ -737,6 +739,7 @@ function continueShoot(){
   function successCallback(stream) {
     gotStream(stream);
     window.stream = stream; // make stream available to console
+    localStream = stream;
     video.src = window.URL.createObjectURL(stream);
     video.play();
     
@@ -781,9 +784,8 @@ function continueShoot(){
     }
   }
 
-  function startStream()
+  function startWebCamStream()
   {
-
     buttonPlay = document.getElementById('buttonPlay');
 
     if(buttonPlay){
@@ -791,11 +793,62 @@ function continueShoot(){
       buttonPlay.style.display = "none";
     }
 
+    /*
+    var p = navigator.mediaDevices.getUserMedia({ audio: false, video: { width: 400, height: 400 } });
+
+    p.then(function(mediaStream) {
+      //var video = document.querySelector('video');
+      video.src = window.URL.createObjectURL(mediaStream);
+      video.onloadedmetadata = function(e) {
+        // Do something with the video here.
+      };
+    });
+
+    */
+
+    /*
+    navigator.mediaDevices.getUserMedia(constraints)
+    .then(function(stream) {
+      var videoTracks = stream.getVideoTracks();
+      log('Got stream with constraints:', constraints);
+      log('Using video device: ' + videoTracks[0].label);
+      stream.onended = function() {
+        log('Stream ended');
+      };
+      window.stream = stream; // make variable available to browser console
+      video.srcObject = stream;
+    })
+    .catch(function(error) {
+      if (error.name === 'ConstraintNotSatisfiedError') {
+        log('The resolution ' + constraints.video.width.exact + 'x' +
+            constraints.video.width.exact + ' px is not supported by your device.');
+      } else if (error.name === 'PermissionDeniedError') {
+        log('Permissions have not been granted to use your camera and ' +
+          'microphone, you need to allow the page access to your devices in ' +
+          'order for the demo to work.');
+      }
+      log('getUserMedia error: ' + error.name, error);
+    });
+
+    */
+
+
+
+
+
+
+
+    
     if (!navigator.getUserMedia) {
           log('getUserMedia not supported');
           showAlertMessage(false,'Your Browser is not cool enough to run this site please use Chrome, Firefox or Opera.');
     } else {
 
+
+      //navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(errorCallback);
+
+
+      
       if (typeof MediaStreamTrack === 'undefined' || typeof MediaStreamTrack.getSources === 'undefined') {
         //alert('This browser does not support MediaStreamTrack.\n\nTry Chrome.');
         log('This browser does not support MediaStreamTrack.');
@@ -820,7 +873,7 @@ function continueShoot(){
 
           videoParameters.innerHTML = '<select class="select nomargin camera-switch" id="videoSource"></select>';
           videoSelect = document.getElementById('videoSource');
-          videoSelect.onchange = startStream;
+          videoSelect.onchange = startWebCamStream;
           MediaStreamTrack.getSources(gotSources);
         }
       }
@@ -831,9 +884,10 @@ function continueShoot(){
       else
       {
 
-        if (window.stream) {
+        if (localStream) {
           video.src = null;
-          window.stream.stop();
+          //localStream.stop();
+          localStream.getVideoTracks()[0].stop();
         }
 
         if (typeof(videoSelect) != 'undefined' && videoSelect != null)
@@ -860,10 +914,54 @@ function continueShoot(){
 
         navigator.getUserMedia(constraints, successCallback, errorCallback);
       } 
-        
+       
     }  
   }
 
-  startStream();
+  startWebCamStream();
 
+/*
+
+  function openLightBox(content)
+  {
+
+    console.log('openLightBox'+ content);
+
+    var lightBox = document.getElementById('light-box');
+
+    if(!lightBox){
+      var lightBoxContent = '<a id="box-close-btn" href="#">Close</a>';
+      lightBoxContent += '<div id="light-box" class="white-content">';
+      lightBoxContent += '<div id="box-content" class="box-content">';
+      lightBoxContent += '</div></div>';
+      lightBoxContent += '<div id="black-overlay" class="black-overlay"></div>';
+      //document.body.innerHTML += lightBoxContent;
+      document.body.insertAdjacentHTML( 'beforeend', lightBoxContent);
+
+      var closeBtn = document.getElementById('box-close-btn');
+      if(closeBtn){
+        closeBtn.addEventListener("click", function(event){ event.preventDefault();  closeLightBox(); });
+      }
+
+    }
+
+    if(content){
+      document.getElementById('box-content').innerHTML = content;
+      document.getElementById('light-box').style.display = 'block';
+      document.getElementById('black-overlay').style.display = 'block';
+      document.getElementById('box-close-btn').style.display = 'block';
+
+    }
+    
+  }
+
+  function closeLightBox()
+  {
+      console.log('closeLightBox');
+      document.getElementById('light-box').style.display = 'none';
+      document.getElementById('black-overlay').style.display = 'none';
+      document.getElementById('box-close-btn').style.display = 'none';
+    
+  }
+*/
 }
