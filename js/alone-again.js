@@ -666,7 +666,7 @@ function continueShoot(){
   {
     log('changeStream');
     stopStream();
-    startStream();
+    startWebCamStream();
   }
 
   function stopStream()

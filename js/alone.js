@@ -710,7 +710,7 @@ function createShoot(){
   {
     log('changeStream');
     stopStream();
-    startStream();
+    startWebCamStream();
   }
 
   function stopStream()
