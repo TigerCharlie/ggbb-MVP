@@ -35,9 +35,9 @@ CREATE TABLE IF NOT EXISTS `shoots` (
   `active` tinyint(1) NOT NULL,
   `timer` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `uploaded_frames` tinyint(4) NOT NULL,
-  `shoottime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `gif_done` tinyint(1) NOT NULL,
-  `thumbnail` tinytext NOT NULL
+  `shoottime` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+  `gif_done` tinyint(1) NOT NULL DEFAULT '0',
+  `thumbnail` tinytext NULL
 ) ENGINE=MyISAM AUTO_INCREMENT=275 DEFAULT CHARSET=utf8;
 
 --
