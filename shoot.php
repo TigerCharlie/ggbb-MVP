@@ -2,51 +2,39 @@
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
 include('includes/config.php');
-
+include('includes/db_connect.php');
 header('Content-Type: application/json; charset=utf-8');
 
-include('includes/db_connect.php');
-
-if(isset($_POST['uuid'])){
+if (isset($_POST['uuid'])) {
 	$uuid = $_POST['uuid'];
+	$response= $bdd->prepare('SELECT * FROM shoots WHERE uuid = :uuid AND active=1 LIMIT 1');
+	$response->execute(
+		array('uuid' => $uuid)
+	);
 
-	$reponse= $bdd->prepare('SELECT * FROM shoots WHERE uuid = :uuid AND active=1 LIMIT 1');
-	$reponse->execute(array(
-					'uuid' => $uuid
-					));
-
-	if($reponse->rowCount() > 0){
-		//$donnees = $reponse->fetch();
-
-		while ($donnees = $reponse->fetch())
-		{	
-			if($donnees['frames']>1){
-
-
+	if ($response->rowCount() > 0) {
+		while ($donnees = $response->fetch()) {
+			if ($donnees['frames']>1) {
 				$shootTimestamp = time()+7;
 				$shootTime = date('Y-m-d H:i:s',$shootTimestamp);
 
 				$req = $bdd->prepare('UPDATE shoots SET shoottime = :shoottime WHERE uuid = :uuid');
-				$req->execute(array(
+				$req->execute(
+					array(
 						'uuid' => $uuid,
 						'shoottime' => $shootTime
-						));
+					)
+				);
 				$serverTimestamp = round(microtime(true)*1000);
 				echo '{"serverTimestamp":'.$serverTimestamp.',"status_code":1,"status":"Shoot in 7 seconds !", "shootTime":'.$shootTimestamp.'}';
-			}else{
+			} else {
 				echo '{"status_code":2,"status":"You are alone... nobody joined the shoot : \"'.$donnees['title'].'\". make friends before shoot !"}';
 			}
-
 		}
-
-	}else{
-		//echo 'le shoot '.$title.' n\'exist pas';
+	} else {
 		echo '{"status_code":0,"status":"the shoot '.$uuid.' doesn\'t exist."}';
 	}
-}else{	
-	//echo 'le titre n\'a pas été transmi';
+} else {
 	echo '{"status_code":-1,"status":"the server never received the uuid."}';
 }
-?>
