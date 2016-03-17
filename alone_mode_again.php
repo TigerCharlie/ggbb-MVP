@@ -1,37 +1,25 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
 include('includes/config.php');
-
+include('includes/db_connect.php');
 
 $is_gif = false;
-
-if(isset($_GET['uuid'])){
-        $uuid = $_GET['uuid'];
-
-        include('includes/db_connect.php');
-
-        $type = 'alone';
-        $reponse= $bdd->prepare('SELECT * FROM shoots WHERE uuid = :uuid AND active = 1 AND type = :type LIMIT 1');
-        $reponse->execute(array(
-            'uuid' => $uuid,
-            'type' => $type
-            ));
-
-        //var_dump($reponse);
-
-        if($reponse->rowCount() > 0){
-
-          $donnees = $reponse->fetch();
-
-          $gif_url = 'img/'.$donnees['uuid'].'.gif';
-
-          $is_gif = true;
-        }
-
+if (isset($_GET['uuid'])) {
+    $uuid = $_GET['uuid'];
+    $type = 'alone';
+    $query = 'SELECT * FROM shoots WHERE uuid = :uuid AND active = 1 AND type = :type LIMIT 1';
+    $response= $bdd->prepare($query);
+    $response->execute(array(
+        'uuid' => $uuid,
+        'type' => $type
+        ));
+    if ($response->rowCount() > 0) {
+      $donnees = $response->fetch();
+      $gif_url = 'img/'.$donnees['uuid'].'.gif';
+      $is_gif = true;
+    }
 }
-
 ?>
 <!doctype html>
     <head>
@@ -75,16 +63,9 @@ if(isset($_GET['uuid'])){
         <meta property="og:url"         content="<?php echo $url_origin.'/'.$gif_url; ?>">
         <meta property="og:title"       content="<?php echo 'alone again mode - '.GGBB_ON_TITLE; ?>">
         <meta property="og:description" content="<?php if($is_gif){echo $donnees['title'];}else{echo 'You can\'t continue this gif !';} ?> - ">
-
-        
     </head>
     <body>
-    
     <div class="container">
-
-    
-
-
     <header>
       <nav>
       <input type="checkbox" id="nav" /><label class="burger"  for="nav"><span></span><span></span><span></span></label>
@@ -94,20 +75,13 @@ if(isset($_GET['uuid'])){
         <li><a href="alone_mode.php">Alone Mode</a></li>
         <li><a href="gifs_list.php">All Gifs</a></li>
       </ul>
-    </nav>
-
-        <a href="<?php echo GGBB_URL;?>"><img class="logo" src="asset/gifgifbangbang.gif"></a>
+      </nav>
+      <a href="<?php echo GGBB_URL;?>"><img class="logo" src="asset/gifgifbangbang.gif"></a>
     </header>
     
     <?php
-      
-        if($is_gif){ 
-
-
-         ?>
-
-
-
+        if ($is_gif) {
+    ?>
         <div id="shot-box" class="shot-box" data-uuid="<?php echo $donnees['uuid'];  ?>" data-frames="<?php echo $donnees['frames']; ?>" data-title="<?php echo $donnees['title']; ?>">
         <div id="video-alert"></div>
         <div id="video-parameters"></div>
@@ -116,31 +90,19 @@ if(isset($_GET['uuid'])){
           <video id="video" autoplay="autoplay"></video>
         </div>
       </div>
-
-
       <div id="form-container">
         <input  class="btn" type="button" id="buttonPlay" value="Start Now !"/>
       </div>
-      <?php 
-      if(isset($_GET['debug'])) {
+    <?php
+        if (isset($_GET['debug'])) {
           echo '<pre id="preLog" class="last">Loading…</pre>';
-      }
-      ?>
-
-
-
-
-      <?php
-      }else{
-      ?>
-
-      <h1>You can't continue this gif !</h1>
-
-      <?php
-      }
-      ?>
-
+        }
+    } else {
+    ?>
+    <h1>You can't continue this gif !</h1>
+    <?php
+        }
+    ?>
     </div>  
     </body>
-
 </html>
