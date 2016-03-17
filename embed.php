@@ -1,37 +1,31 @@
-<!doctype html>
 <?php
-
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
 include('includes/config.php');
+include('includes/db_connect.php');
+$uuid = $_GET['uuid'];
+if (isset($uuid)) {
+    $request = 'SELECT * FROM shoots WHERE uuid = :uuid AND active=1 LIMIT 1';
+    $response = $bdd->prepare($request);
+    $response->execute(array(
+        'uuid' => $uuid
+    ));
 
-   include('includes/db_connect.php');
-
-    if(isset($_GET['uuid'])){
-
-     $uuid = $_GET['uuid']; 
-
-      $reponse= $bdd->prepare('SELECT * FROM shoots WHERE uuid = :uuid AND active=1 LIMIT 1');
-      $reponse->execute(array(
-          'uuid' => $uuid
-          ));
-
-      if($reponse->rowCount() > 0){
-        while ($donnees = $reponse->fetch())
-        {
-          $gif_title = $donnees['title'];
-          $gif_url = 'img/'.$donnees['uuid'].'.gif';
-          //$jpg_url = 'img/'.$donnees['uuid'].'-1.jpg';
-          $jpg_url = 'img/'.$donnees['thumbnail'];
-          $gif_img = '<img data-uuid="'.$uuid.'" id="gif-img" src="'.$gif_url.'">';
+    if ($response->rowCount() > 0) {
+        while ($donnees = $response->fetch()) {
+            $gif_title = $donnees['title'];
+            $gif_url = 'img/'.$donnees['uuid'].'.gif';
+            $jpg_url = 'img/'.$donnees['thumbnail'];
+            $gif_img = '<img data-uuid="'.$uuid.'" id="gif-img" src="'.$gif_url.'">';
         }
-      }else{
+    } else {
         $gif_img = 'No Gif here !!';
-      }
-
     }
+}
 ?>
+
+<!doctype html>
+<html>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -123,5 +117,4 @@ include('includes/config.php');
         </a>
     </div>   
     </body>
-
 </html>
