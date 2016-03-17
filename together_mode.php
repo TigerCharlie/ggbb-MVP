@@ -1,9 +1,10 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
 include('includes/config.php'); ?>
+
 <!doctype html>
+<html>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -81,9 +82,9 @@ include('includes/config.php'); ?>
         <input  class="btn" type="button" id="buttonPlay" value="Start Now !"/>
       </div>
       <?php 
-      if(isset($_GET['debug'])) {
-          echo '<pre id="preLog" class="last">Loading…</pre>';
-      }
+          if (isset($_GET['debug'])) {
+              echo '<pre id="preLog" class="last">Loading…</pre>';
+          }
       ?>
     </div>  
     </body>
