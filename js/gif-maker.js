@@ -16,7 +16,7 @@ window.onload = function()
   function log(text)
   {
     if (preLog){
-      preLog.textContent = (text) + "  ||  " + preLog.textContent;
+      preLog.textContent = (text) + '  ||  ' + preLog.textContent;
       console.log(text);
     }else{ 
       console.log(text);
@@ -121,17 +121,54 @@ window.onload = function()
     };
 
 
+      events.on('videoSourcesAvailable', initVideoSourcesButton);
+
+      function initVideoSourcesButton(videoSources) {
+        if(videoSources.length==0){
+          log('button');
+        }else if(videoSources.length>1){
+          log('select');
+        }
+      }
+
+
       function init() {
         // enable getUserMedia
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
         if (!navigator.getUserMedia) {
           events.emit('getUserMediaNotSupported');
-          console.log('getUserMediaNotSupported');
+          log('getUserMediaNotSupported');
         } else {
           getUserMediaSupport = true;
 
-          enumerateDevices();
+          if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+            log('enumerateDevices() not supported.');
+            
+            if (typeof MediaStreamTrack === 'undefined' || typeof MediaStreamTrack.getSources === 'undefined') {
+              log('This browser does not support MediaStreamTrack.');
+              events.emit('videoSourcesAvailable', []);
+            } else {
+              MediaStreamTrackSupport = true;
+              log('This browser supports MediaStreamTrack.');
+              //GetMediaStreamTrack();
+              //console.log(MediaStreamTrack.getSources(gotSources));
+
+              MediaStreamTrack.getSources(gotSources);
+
+              //console.log(toto);
+            }
+
+          }else{
+            
+            enumerateDevices().then(function(response) {
+              //log(response);
+              events.emit('videoSourcesAvailable', response);
+            }).catch(function(err) {
+              log(err.name + ': ' + err.message);
+            });
+
+          }
 
           //GetMediaStreamTrack();
           //events.emit('getUserMediaSupported');
@@ -142,37 +179,53 @@ window.onload = function()
 
       function enumerateDevices() {
 
-        if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
-          log("enumerateDevices() not supported.");
-        }else{
+        return new Promise(function(resolve, reject) {
+
+          var devicesList = [];
           navigator.mediaDevices.enumerateDevices()
           .then(function(devices) {
+            i=1;
             devices.forEach(function(device) {
-              if(device.kind=='videoinput'){
-                console.log(device.kind + ': ' + device.label + ' id = ' + device.deviceId);
+              if(device.kind === 'videoinput'){
+
+                devicesList.push({label: device.label || 'Camera ' +i, id: device.deviceId}); 
+                //log(device.kind + ': ' + device.label + ' id = ' + device.deviceId);
+                i++;
               }
             });
-          })
-          .catch(function(err) {
-            console.log(err.name + ": " + err.message);
+            //console.log('toto', devicesList);
+            //return devicesList;
+            resolve(devicesList);
+          }).catch(function(err) {
+            log(err.name + ': ' + err.message);
+            reject;
           });
-        }
+
+        });
+        
       }
 
 
 
+      function gotSources(sourceInfos) {
+        
+        //console.log(sourceInfos);
+        //return sourceInfos;
 
-      /*
-      function GetMediaStreamTrack() {
-        if (typeof MediaStreamTrack === 'undefined' || typeof MediaStreamTrack.getSources === 'undefined') {
-          log('This browser does not support MediaStreamTrack.');
-        } else {
-          MediaStreamTrackSupport = true;
-          log('This browser supports MediaStreamTrack.');
-        }
+        var devicesList = [];
+        i=1;
+        sourceInfos.forEach(function(sourceInfo) {
+          if(sourceInfo.kind === 'video'){
+            devicesList.push({label: sourceInfo.label || 'Camera ' +i, id: sourceInfo.id}); 
+            //log(device.kind + ': ' + device.label + ' id = ' + device.deviceId);
+            i++;
+          }
+        });
+
+        events.emit('videoSourcesAvailable', devicesList);
+          //console.log(devicesList);
+          //resolve(devicesList);
       }
-      */
-
 
 
       return {
