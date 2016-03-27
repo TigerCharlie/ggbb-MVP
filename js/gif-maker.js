@@ -130,8 +130,9 @@ window.onload = function()
       }
     }
 
-
     events.on('captureVideoCanPlay', ShowHidePlayButton);
+    events.on('captureVideoOnPlay', ShowHidePlayButton);
+    events.on('captureVideoOnPause', ShowHidePlayButton);
 
     function ShowHidePlayButton() {
       log('ShowHidePlayButton');
@@ -217,10 +218,12 @@ window.onload = function()
 
         captureVideo.onplay = function() {
           log('captureVideo.onplay');
+          events.emit('captureVideoOnPlay');
         };
 
         captureVideo.onpause = function() {
           log('captureVideo.onpause');
+          events.emit('captureVideoOnPause');
         };
       }
 
