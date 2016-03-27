@@ -68,7 +68,7 @@ window.onload = function()
 
     var videoAlert = document.getElementById('video-alert');
     var videoParameters = document.getElementById('video-parameters');
-
+    var videoSelect;
     
 
     function showAlertMessage(good, alertText, hide){
@@ -118,23 +118,24 @@ window.onload = function()
         videoParameters.innerHTML = '<button class="btn nomargin camera-switch" type="button" id="buttonChange" >Change camera</button>';
         var buttonChange = document.getElementById('buttonChange');
         buttonChange.addEventListener("click", function(event){ event.preventDefault();  mycameraCapturer.startVideoStream(); });
-        mycameraCapturer.startVideoStream();
       }else if(videoSources.length>1){
         log('select');
-        videoParameters.innerHTML = '<select class="select nomargin camera-switch" id="videoSource"></select>';
+        var videoSourcesSelectHTML = '<select class="select nomargin camera-switch" id="videoSource">';
         
-        var videoSelect = document.getElementById('videoSource');
-
-        for (var i = 0; i !== videoSources.length; ++i) {     
-          var option = document.createElement('option');
-          option.value = videoSources[i].id;
-          option.text = videoSources[i].label;
-          videoSelect.appendChild(option);
+        for (var i = 0; i !== videoSources.length; ++i) {
+          videoSourcesSelectHTML += '<option value="'+videoSources[i].id+'">'+videoSources[i].label+'</option>';
         }
-        //console.log(mycameraCapturer);
-        videoSelect.onchange = mycameraCapturer.startVideoStream(videoSelect.value);
-      }else{
-        mycameraCapturer.startVideoStream();
+
+        videoSourcesSelectHTML += '</select>';
+        videoParameters.innerHTML = videoSourcesSelectHTML;
+        
+        videoSelect = document.getElementById('videoSource');
+        videoSelect.onchange = function(){
+          log('change'+videoSelect.value);
+          mycameraCapturer.startVideoStream(videoSelect.value);
+        };
+
+
       }
     }
 
@@ -342,7 +343,7 @@ window.onload = function()
     };
 
 
-      //events.on('videoSourcesAvailable', startVideoStream);
+      events.on('videoSourcesAvailable', startVideoStream);
 
       function startVideoStream(streamId) {
         
