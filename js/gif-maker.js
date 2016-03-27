@@ -61,8 +61,10 @@ window.onload = function()
     var shootId = '';
     var shooterId ;
     var gifOwner = false;
+    var mycameraCapturer;
 
     var videoAlert = document.getElementById('video-alert');
+    var videoParameters = document.getElementById('video-parameters');
 
     events.on('getUserMediaNotSupported', alertChangeNavigator);
 
@@ -97,11 +99,62 @@ window.onload = function()
 
     function init() {
        //log('init');
-       var mycameraCapturer = cameraCapturer();
-       mycameraCapturer.init();
+       mycameraCapturer = cameraCapturer();
+       //mycameraCapturer.captureVideo = document.getElementById('video');
+       mycameraCapturer.init(document.getElementById('video'));
     }
 
+
+    events.on('videoSourcesAvailable', initVideoSourcesButton);
+
+    function initVideoSourcesButton(videoSources) {
+      if(videoSources.length==0){
+        log('button');
+        videoParameters.innerHTML = '<button class="btn nomargin camera-switch" type="button" id="buttonChange" >Change camera</button>';
+        var buttonChange = document.getElementById('buttonChange');
+        buttonChange.addEventListener("click", function(event){ event.preventDefault();  mycameraCapturer.startVideoStream(); });
+      }else if(videoSources.length>1){
+        log('select');
+        videoParameters.innerHTML = '<select class="select nomargin camera-switch" id="videoSource"></select>';
+        
+        var videoSelect = document.getElementById('videoSource');
+
+        for (var i = 0; i !== videoSources.length; ++i) {     
+          var option = document.createElement('option');
+          option.value = videoSources[i].id;
+          option.text = videoSources[i].label;
+          videoSelect.appendChild(option);
+        }
+        //console.log(mycameraCapturer);
+        videoSelect.onchange = mycameraCapturer.startVideoStream(videoSelect.value);
+      }
+    }
+
+
+    events.on('captureVideoCanPlay', ShowHidePlayButton);
+
+    function ShowHidePlayButton() {
+      log('ShowHidePlayButton');
+
+      if (mycameraCapturer.checkIfVideoIsPlaying()) {
+        if(buttonPlay){
+          buttonPlay.style.display = "none";
+          showAlertMessage(true, '', true);
+        }
+      }else{
+        if(buttonPlay){
+          showAlertMessage(true, 'Click on the start button to start the camera... Simple no ?');
+          buttonPlay.style.display = "inline-block";
+        }
+      }
+ 
+    }
+
+
+
+
     return {
+      mycameraCapturer: mycameraCapturer,
       shootMode: shootMode,
       init: init,
       videoAlert: videoAlert
@@ -113,26 +166,163 @@ window.onload = function()
   //cameraCapturer
   var cameraCapturer = function(){
 
+    var captureVideo;
+    //console.log(captureVideo);
     var getUserMediaSupport = false;
     var MediaStreamTrackSupport = false;
+    var multipleVideoSourcesAvailable = false;
+    var currentVideoSourceId;
+
 
     var errorCallback = function(e) {
-    console.log('Reeeejected!', e);
+      log(e);
     };
 
 
-      events.on('videoSourcesAvailable', initVideoSourcesButton);
+    function checkIfVideoIsPlaying() {
+      if (captureVideo)
+      { 
+        if (captureVideo.paused) {
+          log('Video is not Playing');
+          return false;
+        }else { 
+          log('Video is Playing');
+          return true;
+        } 
+      }else{
+        return false;
+        log('captureVideo is Undefined');
+      }
+    }
 
-      function initVideoSourcesButton(videoSources) {
-        if(videoSources.length==0){
-          log('button');
-        }else if(videoSources.length>1){
-          log('select');
-        }
+    
+    function gotStream(stream)
+    {
+      log('Got stream.');
+      videoStream = stream;
+      //showHidePlayButton(video);
+
+      if (captureVideo)
+      { 
+        captureVideo.onerror = function ()
+        {
+          log('captureVideo.onerror');
+          Pause();
+        };
+
+        captureVideo.oncanplay = function() {
+          log('captureVideo.oncanplay');
+          events.emit('captureVideoCanPlay');
+        };
+
+        captureVideo.onplay = function() {
+          log('captureVideo.onplay');
+        };
+
+        captureVideo.onpause = function() {
+          log('captureVideo.onpause');
+        };
       }
 
+      stream.onended = function ()
+      {
+        log('stream.onended');
+      };
 
-      function init() {
+    }
+
+    function Play()
+    {
+      if (captureVideo)
+      {
+        captureVideo.play();
+      }
+    }
+
+    function Pause()
+    {
+      if (captureVideo)
+      {
+        captureVideo.Pause();
+      }
+    }
+
+
+
+    function StreamSuccessCallback(stream) {
+      log('successCallback');
+
+      gotStream(stream);
+      window.stream = stream; // make stream available to console
+
+      if (captureVideo)
+      {
+        if (window.URL) {
+          captureVideo.src = window.URL.createObjectURL(stream);
+        } 
+        else if (captureVideo.mozSrcObject !== undefined)
+        {//FF18a
+          captureVideo.mozSrcObject = stream;
+          captureVideo.play();
+        }
+        else if (navigator.mozGetUserMedia)
+        {//FF16a, 17a
+          captureVideo.src = stream;
+          captureVideo.play();
+        }
+        else if (window.webkitURL) 
+        {
+          captureVideo.src = window.webkitURL.createObjectURL(stream); 
+        }
+        else 
+        {
+          captureVideo.src = stream;
+        }
+        captureVideo.play();
+      }else{
+        log('captureVideo is Undefined');
+      }
+    };
+
+
+      events.on('videoSourcesAvailable', startVideoStream);
+
+      function startVideoStream(streamId) {
+        
+        /*
+        if (window.stream) {
+          video.src = null;
+          window.stream.stop();
+        }*/
+
+        if (typeof streamId === 'string' || streamId instanceof String)
+        {
+          log('with video sources…');
+          var constraints = {
+              video: {
+                optional: [{
+                  sourceId: streamId
+                }]
+              }
+            };
+        }else{ 
+          log('without video sources…');
+          var constraints = {
+              video: {
+              }
+            };
+          //var currentVideoSource = 0;
+        }
+
+        log('get user media…');
+        navigator.getUserMedia(constraints, StreamSuccessCallback, errorCallback);
+      };      
+
+
+      function init(thisCaptureVideo) {
+
+        captureVideo = thisCaptureVideo;
+
         // enable getUserMedia
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
@@ -153,23 +343,18 @@ window.onload = function()
               log('This browser supports MediaStreamTrack.');
               //GetMediaStreamTrack();
               //console.log(MediaStreamTrack.getSources(gotSources));
-
               MediaStreamTrack.getSources(gotSources);
-
               //console.log(toto);
             }
 
           }else{
-            
             enumerateDevices().then(function(response) {
               //log(response);
               events.emit('videoSourcesAvailable', response);
             }).catch(function(err) {
               log(err.name + ': ' + err.message);
             });
-
           }
-
           //GetMediaStreamTrack();
           //events.emit('getUserMediaSupported');
           //console.log('getUserMediaSupported');
@@ -208,9 +393,6 @@ window.onload = function()
 
 
       function gotSources(sourceInfos) {
-        
-        //console.log(sourceInfos);
-        //return sourceInfos;
 
         var devicesList = [];
         i=1;
@@ -227,12 +409,16 @@ window.onload = function()
           //resolve(devicesList);
       }
 
-
+      
       return {
+        captureVideo: captureVideo,
         getUserMediaSupport: getUserMediaSupport,
         MediaStreamTrackSupport: MediaStreamTrackSupport,
-        init: init
+        init: init,
+        startVideoStream: startVideoStream,
+        checkIfVideoIsPlaying: checkIfVideoIsPlaying
       };
+
 
   };
 
