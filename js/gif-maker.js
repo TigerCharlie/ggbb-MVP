@@ -134,8 +134,6 @@ window.onload = function()
           log('change'+videoSelect.value);
           mycameraCapturer.startVideoStream(videoSelect.value);
         };
-
-
       }
     }
 
@@ -170,24 +168,33 @@ window.onload = function()
       videoContainer.style.height = videoContainerHeight+"px";
       videoContainer.style.top = videoMarginTop+"px";
       videoContainer.style.left = videoMarginLeft+"px";
-
-      /*$('.container-video').css( "width", videoContainerwidth+'px' );
-      $('.container-video').css( "height", videoContainerHeight+'px' );
-      $('.container-video').css( "top", videoMarginTop+'px' );
-      $('.container-video').css( "left", videoMarginLeft+'px' );*/
-
     }
 
 
     events.on('captureVideoCanPlay', ShowHidePlayButton);
+    events.on('captureVideoCanPlay', initPlayButton);
+
     events.on('captureVideoOnPlay', ShowHidePlayButton);
+    events.on('captureVideoOnPlay', initShootCreation);
+
     events.on('captureVideoOnPause', ShowHidePlayButton);
     events.on('captureVideoOnLoadedMetaData', resizeVideo);
 
 
+    function initShootCreation() {
+      log('initiate Shoot ! in mode :'+shootMode);
+      events.off('captureVideoOnPlay', initShootCreation);
+    }
+
+    function initPlayButton() {
+      var buttonPlay = document.getElementById('buttonPlay');
+      buttonPlay.addEventListener("click", function(event){ event.preventDefault();  mycameraCapturer.Play(); });
+
+      events.off('captureVideoCanPlay', initPlayButton);
+    }
+
     function ShowHidePlayButton() {
       log('ShowHidePlayButton');
-
       if (mycameraCapturer.checkIfVideoIsPlaying()) {
         if(buttonPlay){
           buttonPlay.style.display = "none";
@@ -201,7 +208,6 @@ window.onload = function()
       }
  
     }
-
 
     return {
       mycameraCapturer: mycameraCapturer,
@@ -449,7 +455,6 @@ window.onload = function()
       }
 
 
-
       function gotSources(sourceInfos) {
 
         var devicesList = [];
@@ -466,7 +471,6 @@ window.onload = function()
           //console.log(devicesList);
           //resolve(devicesList);
       }
-
       
       return {
         captureVideo: captureVideo,
@@ -476,10 +480,10 @@ window.onload = function()
         startVideoStream: startVideoStream,
         checkIfVideoIsPlaying: checkIfVideoIsPlaying
       };
-
-
   };
 
+
+  gifShooter.shootMode = 'together';
   gifShooter.init();
 
 }
