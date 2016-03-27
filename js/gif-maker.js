@@ -63,10 +63,13 @@ window.onload = function()
     var gifOwner = false;
     var mycameraCapturer;
 
+    var video = document.getElementById('video');
+    var videoContainer = document.getElementById("container-video");
+
     var videoAlert = document.getElementById('video-alert');
     var videoParameters = document.getElementById('video-parameters');
 
-    events.on('getUserMediaNotSupported', alertChangeNavigator);
+    
 
     function showAlertMessage(good, alertText, hide){
 
@@ -92,6 +95,8 @@ window.onload = function()
 
     }
 
+    events.on('getUserMediaNotSupported', alertChangeNavigator);
+
     function alertChangeNavigator() {
       showAlertMessage(false,'Your Browser is not cool enough to run this site please use Chrome, Firefox.');
       console.log('Your Browser is not cool enough to run this site please use Chrome, Firefox.');
@@ -101,7 +106,7 @@ window.onload = function()
        //log('init');
        mycameraCapturer = cameraCapturer();
        //mycameraCapturer.captureVideo = document.getElementById('video');
-       mycameraCapturer.init(document.getElementById('video'));
+       mycameraCapturer.init(video);
     }
 
 
@@ -113,6 +118,7 @@ window.onload = function()
         videoParameters.innerHTML = '<button class="btn nomargin camera-switch" type="button" id="buttonChange" >Change camera</button>';
         var buttonChange = document.getElementById('buttonChange');
         buttonChange.addEventListener("click", function(event){ event.preventDefault();  mycameraCapturer.startVideoStream(); });
+        mycameraCapturer.startVideoStream();
       }else if(videoSources.length>1){
         log('select');
         videoParameters.innerHTML = '<select class="select nomargin camera-switch" id="videoSource"></select>';
@@ -127,12 +133,56 @@ window.onload = function()
         }
         //console.log(mycameraCapturer);
         videoSelect.onchange = mycameraCapturer.startVideoStream(videoSelect.value);
+      }else{
+        mycameraCapturer.startVideoStream();
       }
     }
+
+
+    function resizeVideo()
+    {    
+      var shotBoxWidth=document.getElementById('shot-box').clientWidth;
+      var videoContainerSize=shotBoxWidth;
+
+      var videoWidth=video.videoWidth;
+      var videoHeight=video.videoHeight;
+      
+      log(shotBoxWidth+' / '+videoWidth+' / '+videoHeight+' / ');
+
+      if(videoWidth>videoHeight){
+        
+        var videoContainerwidth= Math.round(shotBoxWidth*(videoWidth/videoHeight));
+        var videoContainerHeight=shotBoxWidth;
+        var videoMarginTop=0;
+        var videoMarginLeft= Math.round((shotBoxWidth-videoContainerwidth)/2);
+      }else{
+
+        var videoContainerwidth=shotBoxWidth;
+        var videoContainerHeight= Math.round(shotBoxWidth/(videoWidth/videoHeight));
+        var videoMarginLeft=0;
+        var videoMarginTop= Math.round((shotBoxWidth-videoContainerHeight)/2);
+      }
+
+      log(videoContainerwidth+' / '+videoContainerHeight+' / '+videoMarginLeft+' / '+videoMarginTop);
+
+      videoContainer.style.width = videoContainerwidth+"px";
+      videoContainer.style.height = videoContainerHeight+"px";
+      videoContainer.style.top = videoMarginTop+"px";
+      videoContainer.style.left = videoMarginLeft+"px";
+
+      /*$('.container-video').css( "width", videoContainerwidth+'px' );
+      $('.container-video').css( "height", videoContainerHeight+'px' );
+      $('.container-video').css( "top", videoMarginTop+'px' );
+      $('.container-video').css( "left", videoMarginLeft+'px' );*/
+
+    }
+
 
     events.on('captureVideoCanPlay', ShowHidePlayButton);
     events.on('captureVideoOnPlay', ShowHidePlayButton);
     events.on('captureVideoOnPause', ShowHidePlayButton);
+    events.on('captureVideoOnLoadedMetaData', resizeVideo);
+
 
     function ShowHidePlayButton() {
       log('ShowHidePlayButton');
@@ -150,8 +200,6 @@ window.onload = function()
       }
  
     }
-
-
 
 
     return {
@@ -225,6 +273,12 @@ window.onload = function()
           log('captureVideo.onpause');
           events.emit('captureVideoOnPause');
         };
+
+        captureVideo.onloadedmetadata = function() {
+          log('captureVideoOnLoadedMetaData');
+          events.emit('captureVideoOnLoadedMetaData');
+        };
+
       }
 
       stream.onended = function ()
@@ -288,7 +342,7 @@ window.onload = function()
     };
 
 
-      events.on('videoSourcesAvailable', startVideoStream);
+      //events.on('videoSourcesAvailable', startVideoStream);
 
       function startVideoStream(streamId) {
         
