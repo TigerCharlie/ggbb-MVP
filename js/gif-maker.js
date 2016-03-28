@@ -335,12 +335,10 @@ window.onload = function()
         else if (captureVideo.mozSrcObject !== undefined)
         {//FF18a
           captureVideo.mozSrcObject = stream;
-          captureVideo.play();
         }
         else if (navigator.mozGetUserMedia)
         {//FF16a, 17a
           captureVideo.src = stream;
-          captureVideo.play();
         }
         else if (window.webkitURL) 
         {
@@ -410,8 +408,8 @@ window.onload = function()
           
           navigator.getUserMedia (
             constraints,
-            function(localMediaStream) {
-             streamSuccessCallback(localMediaStream);
+            function(stream) {
+             streamSuccessCallback(stream);
             },
             function(err) {
              errorCallback(err);
