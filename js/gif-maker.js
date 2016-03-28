@@ -226,7 +226,6 @@ window.onload = function()
     //console.log(captureVideo);
     var getUserMediaSupport = false;
     var MediaStreamTrackSupport = false;
-    var multipleVideoSourcesAvailable = false;
     var currentVideoSourceId;
 
 
@@ -351,6 +350,15 @@ window.onload = function()
     };
 
 
+      /*
+      var getUserMediaFallBack = function(constraints, successCallback, errorCallback) {
+        return new Promise(function(successCallback, errorCallback) {
+          getUserMedia.call(navigator, constraints, successCallback, errorCallback);
+        });          
+      }
+      */
+
+
       events.on('videoSourcesAvailable', startVideoStream);
 
       function startVideoStream(streamId) {
@@ -365,23 +373,62 @@ window.onload = function()
         {
           log('with video sources…');
           var constraints = {
+              audio: false,
               video: {
-                optional: [{
-                  sourceId: streamId
-                }]
+                optional: [{ sourceId: streamId }],
+                //width: { ideal: 400 },
+                //height: { ideal: 400 }
               }
             };
         }else{ 
           log('without video sources…');
           var constraints = {
+              audio: false,
               video: {
+                //width: { ideal: 400 },
+                //height: { ideal: 400 }
               }
             };
           //var currentVideoSource = 0;
         }
 
         log('get user media…');
-        navigator.getUserMedia(constraints, streamSuccessCallback, errorCallback);
+        
+        
+        if(navigator.mediaDevices === undefined) {
+          navigator.mediaDevices = {};
+        }
+
+        if(navigator.mediaDevices.getUserMedia === undefined) {
+          
+          navigator.getUserMedia (
+            // constraints
+            constraints,
+
+            // successCallback
+            function(localMediaStream) {
+             streamSuccessCallback(localMediaStream);
+            },
+
+            // errorCallback
+            function(err) {
+             console.log("The following error occured: " + err);
+            }
+          );
+
+          
+        }else{
+
+          navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+            streamSuccessCallback(stream);
+          })
+          .catch(function(err) {
+            errorCallback(err);
+          });
+        }
+
+
+
       };      
 
 
