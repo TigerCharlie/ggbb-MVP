@@ -119,6 +119,7 @@ window.onload = function()
         var buttonChange = document.getElementById('buttonChange');
         buttonChange.addEventListener("click", function(event){ event.preventDefault();  mycameraCapturer.startVideoStream(); });
       }else if(videoSources.length>1){
+      
         log('select');
         var videoSourcesSelectHTML = '<select class="select nomargin camera-switch" id="videoSource">';
         
@@ -389,7 +390,8 @@ window.onload = function()
         captureVideo = thisCaptureVideo;
 
         // enable getUserMedia
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+        window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
 
         if (!navigator.getUserMedia) {
           events.emit('getUserMediaNotSupported');
@@ -458,6 +460,7 @@ window.onload = function()
 
       function gotSources(sourceInfos) {
 
+        log('gotSources');
         var devicesList = [];
         i=1;
         sourceInfos.forEach(function(sourceInfo) {
