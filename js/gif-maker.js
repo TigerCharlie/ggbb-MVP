@@ -68,6 +68,7 @@ window.onload = function()
 
     var videoAlert = document.getElementById('video-alert');
     var videoParameters = document.getElementById('video-parameters');
+    var formContainer =  document.getElementById('form-container');
     var videoSelect;
     
 
@@ -173,7 +174,7 @@ window.onload = function()
 
 
     events.on('captureVideoCanPlay', ShowHidePlayButton);
-    events.on('captureVideoCanPlay', initPlayButton);
+    events.on('streamSuccess', initPlayButton);
 
     events.on('captureVideoOnPlay', ShowHidePlayButton);
     events.on('captureVideoOnPlay', initShootCreation);
@@ -189,8 +190,12 @@ window.onload = function()
 
     function initPlayButton() {
       var buttonPlay = document.getElementById('buttonPlay');
-      buttonPlay.addEventListener("click", function(event){ event.preventDefault(); log('play click !'); mycameraCapturer.Play(); });
-      events.off('captureVideoCanPlay', initPlayButton);
+      if(!buttonPlay){
+        formContainer.innerHTML = '<button class="btn" id="buttonPlay" >Start Now !</button>';
+        var buttonPlay = document.getElementById('buttonPlay');
+        buttonPlay.addEventListener("click", function(event){ event.preventDefault(); log('play click !'); mycameraCapturer.play(); });
+      }
+      events.off('streamSuccess', initPlayButton);
     }
 
     function ShowHidePlayButton() {
@@ -317,6 +322,8 @@ window.onload = function()
     function streamSuccessCallback(stream) {
       log('successCallback');
 
+      events.emit('streamSuccess', stream);
+
       gotStream(stream);
       window.stream = stream; // make stream available to console
 
@@ -402,17 +409,12 @@ window.onload = function()
         if(navigator.mediaDevices.getUserMedia === undefined) {
           
           navigator.getUserMedia (
-            // constraints
             constraints,
-
-            // successCallback
             function(localMediaStream) {
              streamSuccessCallback(localMediaStream);
             },
-
-            // errorCallback
             function(err) {
-             console.log("The following error occured: " + err);
+             errorCallback(err);
             }
           );
 

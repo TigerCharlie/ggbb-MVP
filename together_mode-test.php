@@ -72,13 +72,12 @@ include('includes/config.php'); ?>
         <img class="target" id="target" src="asset/target.png">
         <div id="result"><canvas id="canvas"></canvas></div>
         <div id="container-video" class="container-video">
-          <video id="video" autoplay="autoplay"></video>
+          <video id="video"></video>
         </div>
       </div>
 
 
       <div id="form-container">
-        <input  class="btn" type="button" id="buttonPlay" value="Start Now !"/>
       </div>
       <?php 
       if(isset($_GET['debug'])) {
