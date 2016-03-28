@@ -188,8 +188,7 @@ window.onload = function()
 
     function initPlayButton() {
       var buttonPlay = document.getElementById('buttonPlay');
-      buttonPlay.addEventListener("click", function(event){ event.preventDefault();  mycameraCapturer.Play(); });
-
+      buttonPlay.addEventListener("click", function(event){ event.preventDefault(); log('play click !'); mycameraCapturer.Play(); });
       events.off('captureVideoCanPlay', initPlayButton);
     }
 
@@ -295,25 +294,27 @@ window.onload = function()
 
     }
 
-    function Play()
+    function play()
     {
       if (captureVideo)
       {
+        log('play');
         captureVideo.play();
       }
     }
 
-    function Pause()
+    function pause()
     {
       if (captureVideo)
       {
+        log('pause');
         captureVideo.Pause();
       }
     }
 
 
 
-    function StreamSuccessCallback(stream) {
+    function streamSuccessCallback(stream) {
       log('successCallback');
 
       gotStream(stream);
@@ -379,7 +380,7 @@ window.onload = function()
         }
 
         log('get user media…');
-        navigator.getUserMedia(constraints, StreamSuccessCallback, errorCallback);
+        navigator.getUserMedia(constraints, streamSuccessCallback, errorCallback);
       };      
 
 
@@ -478,7 +479,9 @@ window.onload = function()
         MediaStreamTrackSupport: MediaStreamTrackSupport,
         init: init,
         startVideoStream: startVideoStream,
-        checkIfVideoIsPlaying: checkIfVideoIsPlaying
+        checkIfVideoIsPlaying: checkIfVideoIsPlaying,
+        play: play,
+        pause: pause
       };
   };
 
