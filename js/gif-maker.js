@@ -301,6 +301,7 @@ window.onload = function()
   var cameraCapturer = function(){
 
     var captureVideo;
+    var captureStream;
     //console.log(captureVideo);
     var getUserMediaSupport = false;
     var MediaStreamTrackSupport = false;
@@ -398,7 +399,8 @@ window.onload = function()
       events.emit('streamSuccess', stream);
 
       gotStream(stream);
-      window.stream = stream; // make stream available to console
+      //window.stream = stream; // make stream available to console
+      captureStream = stream;
 
       if (captureVideo)
       {
@@ -441,9 +443,9 @@ window.onload = function()
 
       function startVideoStream(streamId) {
         
-        if (window.stream) {
-          video.src = null;
-          window.stream.stop();
+        if (captureStream) {
+          captureVideo.src = null;
+          captureStream.stop();
         }
 
         if (typeof streamId === 'string' || streamId instanceof String)
