@@ -368,11 +368,11 @@ window.onload = function()
 
       function startVideoStream(streamId) {
         
-        /*
+        
         if (window.stream) {
           video.src = null;
           window.stream.stop();
-        }*/
+        }
 
         if (typeof streamId === 'string' || streamId instanceof String)
         {
