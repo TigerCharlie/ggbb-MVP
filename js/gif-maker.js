@@ -445,7 +445,8 @@ window.onload = function()
         
         if (captureStream) {
           captureVideo.src = null;
-          captureStream.stop();
+          //captureStream.stop();
+          captureStream.getTracks().forEach(function (track) { track.stop(); });
         }
 
         if (typeof streamId === 'string' || streamId instanceof String)
