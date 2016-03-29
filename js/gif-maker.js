@@ -73,7 +73,6 @@ window.onload = function()
     
 
     function showAlertMessage(good, alertText, hide){
-
       good = typeof good !== 'undefined' ? good : true;
       hide = typeof hide !== 'undefined' ? hide : false;
 
@@ -91,9 +90,7 @@ window.onload = function()
 
         videoAlert.innerHTML = alertText;
         videoAlert.style.display = 'block';
-
       }
-
     }
 
     events.on('getUserMediaNotSupported', alertChangeNavigator);
@@ -109,7 +106,6 @@ window.onload = function()
        //mycameraCapturer.captureVideo = document.getElementById('video');
        mycameraCapturer.init(video);
     }
-
 
     events.on('videoSourcesAvailable', initVideoSourcesButton);
 
@@ -141,7 +137,6 @@ window.onload = function()
         };
       }
     }
-
 
     function resizeVideo()
     {    
@@ -185,15 +180,89 @@ window.onload = function()
     events.on('captureVideoOnPause', ShowHidePlayButton);
     events.on('captureVideoOnLoadedMetaData', resizeVideo);
 
+    function snapshot(){
+
+      document.getElementById('buttonShoot').disabled = true;
+      showAlertMessage(true,'Snap !!!');
+
+      if (navigator.vibrate) {
+        navigator.vibrate(200);
+      }
+
+        canvas.width = 400;
+        canvas.height = 400;
+
+      if(video.videoWidth>video.videoHeight){
+
+        var drawSize = video.videoHeight;
+        var topDraw = 0;
+        var leftDraw = Math.round((video.videoWidth-video.videoHeight)/2);
+
+      }else{
+        var drawSize = video.videoWidth;
+        var topDraw = Math.round((video.videoHeight-video.videoWidth)/2);
+        var leftDraw = 0;
+
+      }
+
+      var userAgent = navigator.userAgent.toLowerCase();
+
+      if((userAgent.indexOf('firefox/43') > -1 || userAgent.indexOf('firefox/42') > -1) && userAgent.indexOf('android') > -1)
+      {
+
+        ctx.setTransform(1,0,0,-1,0,video.videoHeight-(drawSize/2));
+         log('ff43 or ff42| V2');
+
+      }else{
+          log('not FF| V2');
+          
+      }
+
+      try {
+        ctx.drawImage(video, leftDraw, topDraw,drawSize,drawSize,0,0,400,400); 
+      } catch (e) {
+        log('bug firefox'+e);
+        throw e;
+      }
+      //exportCanvas();
+    }
+
+
 
     function initShootCreation() {
       log('initiate Shoot ! in mode :'+shootMode);
       events.off('captureVideoOnPlay', initShootCreation);
+
+      if (shootMode === 'alone'){
+        showAlertMessage(true, 'You can start shooting right now !');
+
+        var htmlContent = '<button  class="btn" id="buttonShoot"  type="button" >SHOOT!</button>';
+
+        htmlContent += '<button  class="btn" id="buttonGenerateGif"  type="button" disabled >Generate gif</button>';
+
+        formContainer.innerHTML = htmlContent;
+
+        var buttonShoot = document.getElementById('buttonShoot');
+        if(buttonShoot){
+          buttonShoot.addEventListener("click",  function(event){ event.preventDefault();  snapshot(); });
+        }
+
+        var buttonGenerate = document.getElementById('buttonGenerateGif');
+        if(buttonGenerate){
+          buttonGenerate.addEventListener("click",  function(event){ event.preventDefault();  generateGif(); });
+        }
+      }else if(shootMode === 'together'){
+
+      }else{
+
+      }
+
     }
 
     function initPlayButton() {
       var buttonPlay = document.getElementById('buttonPlay');
       if(!buttonPlay){
+        showAlertMessage(true, 'Click on the start button to start the camera... Simple no ?');
         formContainer.innerHTML = '<button class="btn" id="buttonPlay" >Start Now !</button>';
         var buttonPlay = document.getElementById('buttonPlay');
         buttonPlay.addEventListener("click", function(event){ event.preventDefault(); log('play click !'); mycameraCapturer.play(); });
@@ -221,7 +290,8 @@ window.onload = function()
       mycameraCapturer: mycameraCapturer,
       shootMode: shootMode,
       init: init,
-      videoAlert: videoAlert
+      videoAlert: videoAlert,
+      showAlertMessage: showAlertMessage
     };
 
   })();
@@ -239,8 +309,8 @@ window.onload = function()
 
     var errorCallback = function(e) {
       log(e);
+      gifShooter.showAlertMessage(false, e.message);
     };
-
 
     function checkIfVideoIsPlaying() {
       if (captureVideo)
