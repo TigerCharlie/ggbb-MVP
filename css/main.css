@@ -55,6 +55,9 @@ table {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+button:focus, a:focus  {outline:none;}
+button::-moz-focus-inner, a::-moz-focus-inner {border:0;}
+
 /* ==========================================================================
    reset-end
    ========================================================================== */
