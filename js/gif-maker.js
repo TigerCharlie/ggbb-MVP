@@ -117,7 +117,7 @@ window.onload = function()
 
       var userAgent = navigator.userAgent.toLowerCase();
 
-      if(videoSources.length==0 || (userAgent.indexOf('firefox') > -1){
+      if(videoSources.length==0 || userAgent.indexOf('firefox') > -1){
         log('button');
         videoParameters.innerHTML = '<button class="btn nomargin camera-switch" type="button" id="buttonChange" >Change camera</button>';
         var buttonChange = document.getElementById('buttonChange');
