@@ -72,7 +72,7 @@ include('includes/config.php'); ?>
         <img class="target" id="target" src="asset/target.png">
         <div id="result"><canvas id="canvas"></canvas></div>
         <div id="container-video" class="container-video">
-          <video id="video"></video>
+          <video id="video" autoplay="autoplay"></video>
         </div>
       </div>
 
