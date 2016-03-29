@@ -114,7 +114,10 @@ window.onload = function()
     events.on('videoSourcesAvailable', initVideoSourcesButton);
 
     function initVideoSourcesButton(videoSources) {
-      if(videoSources.length==0){
+
+      var userAgent = navigator.userAgent.toLowerCase();
+
+      if(videoSources.length==0 || (userAgent.indexOf('firefox') > -1){
         log('button');
         videoParameters.innerHTML = '<button class="btn nomargin camera-switch" type="button" id="buttonChange" >Change camera</button>';
         var buttonChange = document.getElementById('buttonChange');
@@ -367,7 +370,6 @@ window.onload = function()
       events.on('videoSourcesAvailable', startVideoStream);
 
       function startVideoStream(streamId) {
-        
         
         if (window.stream) {
           video.src = null;
