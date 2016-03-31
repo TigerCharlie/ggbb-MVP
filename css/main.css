@@ -589,6 +589,15 @@ pre {
   z-index: 60;
   display: none;
   color:#fff;
+  font-size: 1.2em;
+  line-height: 1.4em;
+}
+
+#video-alert a{
+  background: #000;
+  padding: 2px 5px;
+  text-decoration: none;
+  color:#fff;
 }
 
 .container-video{

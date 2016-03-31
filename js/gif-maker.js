@@ -71,6 +71,7 @@ window.onload = function()
     var formContainer =  document.getElementById('form-container');
     var videoSelect;
     
+    var userAgent = navigator.userAgent.toLowerCase();
 
     function showAlertMessage(good, alertText, hide){
       good = typeof good !== 'undefined' ? good : true;
@@ -96,8 +97,19 @@ window.onload = function()
     events.on('getUserMediaNotSupported', alertChangeNavigator);
 
     function alertChangeNavigator() {
-      showAlertMessage(false,'Your Browser is not cool enough to run this site please use Chrome, Firefox.');
-      console.log('Your Browser is not cool enough to run this site please use Chrome, Firefox.');
+
+      if (userAgent.indexOf('apple') > -1){
+        var chromeLink = '<a href="https://geo.itunes.apple.com/fr/app/chrome-le-navigateur-web-google/id535886823?mt=8">Chrome</a>';
+        var firefoxLink = '<a href="https://geo.itunes.apple.com/fr/app/navigateur-web-firefox/id989804926?mt=8">Firefox</a>';
+      }else if (userAgent.indexOf('android') > -1){
+        var chromeLink = '<a href="https://play.google.com/store/apps/details?id=com.android.chrome">Chrome</a>';
+        var firefoxLink = '<a href="https://play.google.com/store/apps/details?id=org.mozilla.firefox">Firefox</a>';
+      } else {
+        var chromeLink = 'Chrome';
+        var firefoxLink = 'Firefox';
+      }
+      showAlertMessage(false,'Your Browser is not cool enough to run this site !<br> Please use '+chromeLink+' or '+firefoxLink+'.');
+      log('Your Browser is not cool enough to run this site please use Chrome, Firefox.');
     }
 
     function init() {
@@ -110,8 +122,6 @@ window.onload = function()
     events.on('videoSourcesAvailable', initVideoSourcesButton);
 
     function initVideoSourcesButton(videoSources) {
-
-      var userAgent = navigator.userAgent.toLowerCase();
 
       if(videoSources.length==0 || userAgent.indexOf('firefox') > -1){
         log('button');
@@ -204,8 +214,6 @@ window.onload = function()
         var leftDraw = 0;
 
       }
-
-      var userAgent = navigator.userAgent.toLowerCase();
 
       if((userAgent.indexOf('firefox/43') > -1 || userAgent.indexOf('firefox/42') > -1) && userAgent.indexOf('android') > -1)
       {
