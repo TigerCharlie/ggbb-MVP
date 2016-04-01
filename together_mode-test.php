@@ -12,6 +12,9 @@ include('includes/config.php'); ?>
         <meta name="viewport" content="width=device-width, initial-scale=1">
        
         <link rel="stylesheet" href="css/main.css?<?php echo date('l jS \of F Y h:i:s A'); ?>">
+        
+
+
         <script src="js/gif-maker.js?<?php echo date('l jS \of F Y h:i:s A'); ?>"></script>
 
 
@@ -84,7 +87,14 @@ include('includes/config.php'); ?>
           echo '<pre id="preLog" class="last">Loading…</pre>';
       }
       ?>
-    </div>  
+    </div> 
     </body>
-
+    <script type="text/javascript">
+          window.onload = function()
+          { 
+            if(gifShooter){
+              gifShooter.init('together', '<?php echo GGBB_URL;?>');
+            } 
+          }
+        </script>
 </html>
