@@ -12,9 +12,10 @@
 //{
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
   //log function
-  var preLog = document.getElementById('preLog');
+  
   function log(text)
   {
+    var preLog = document.getElementById('preLog');
     if (preLog){
       preLog.textContent = (text) + '  ||  ' + preLog.textContent;
       console.log(text);
@@ -1100,7 +1101,7 @@
       if (captureVideo)
       {
         log('pause');
-        captureVideo.capturePause();
+        captureVideo.pause();
       }
     }
 
