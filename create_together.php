@@ -55,19 +55,7 @@ include('includes/config.php'); ?>
     <body>
     
     <div class="container">
-    <header>
-      <nav>
-      <input type="checkbox" id="nav" /><label class="burger"  for="nav"><span></span><span></span><span></span></label>
-      <ul>
-        <li><a href="index.php">Homepage</a></li>
-        <li><a href="together_mode.php">Together Mode</a></li>
-        <li><a href="alone_mode.php">Alone Mode</a></li>
-        <li><a href="gifs_list.php">All Gifs</a></li>
-      </ul>
-    </nav>
-
-        <a href="<?php echo GGBB_URL;?>"><img class="logo" src="asset/gifgifbangbang.gif"></a>
-    </header>
+    <?php include('header.php'); ?>
       
       <div id="shot-box" class="shot-box">
         <div id="video-alert"></div>
@@ -93,7 +81,6 @@ include('includes/config.php'); ?>
           window.onload = function()
           { 
             if(gifShooter){
-              //gifShooter.init('together', '<?php echo GGBB_URL;?>');
               gifShooter.init('together');
             } 
           }

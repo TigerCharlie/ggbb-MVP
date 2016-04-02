@@ -12,11 +12,8 @@ include('includes/config.php'); ?>
         <meta name="viewport" content="width=device-width, initial-scale=1">
        
         <link rel="stylesheet" href="css/main.css?<?php echo date('l jS \of F Y h:i:s A'); ?>">
-        
-
 
         <script src="js/gif-maker.js?<?php echo date('l jS \of F Y h:i:s A'); ?>"></script>
-
 
         <link rel="icon" type="image/png" href="asset/favicon.png" />
         <meta name="apple-mobile-web-app-title" content="<?php echo GGBB_ON_TITLE; ?>">
@@ -55,19 +52,7 @@ include('includes/config.php'); ?>
     <body>
     
     <div class="container">
-    <header>
-      <nav>
-      <input type="checkbox" id="nav" /><label class="burger"  for="nav"><span></span><span></span><span></span></label>
-      <ul>
-        <li><a href="index.php">Homepage</a></li>
-        <li><a href="together_mode.php">Together Mode</a></li>
-        <li><a href="alone_mode.php">Alone Mode</a></li>
-        <li><a href="gifs_list.php">All Gifs</a></li>
-      </ul>
-    </nav>
-
-        <a href="<?php echo GGBB_URL;?>"><img class="logo" src="asset/gifgifbangbang.gif"></a>
-    </header>
+    <?php include('header.php'); ?>
       
       <div id="shot-box" class="shot-box">
         <div id="video-alert"></div>
@@ -78,7 +63,6 @@ include('includes/config.php'); ?>
           <video id="video" autoplay="autoplay"></video>
         </div>
       </div>
-
 
       <div id="form-container">
       </div>
@@ -93,8 +77,7 @@ include('includes/config.php'); ?>
           window.onload = function()
           { 
             if(gifShooter){
-              //gifShooter.init('together', '<?php echo GGBB_URL;?>');
-              gifShooter.init('together');
+              gifShooter.init('joinTogether');
             } 
           }
         </script>

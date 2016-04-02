@@ -156,7 +156,12 @@
         log('button');
         videoParameters.innerHTML = '<button class="btn nomargin camera-switch" type="button" id="buttonChange" >Change camera</button>';
         var buttonChange = document.getElementById('buttonChange');
-        buttonChange.addEventListener('click', function(event){ event.preventDefault();  mycameraCapturer.startVideoStream(); });
+        buttonChange.addEventListener('click', function(event){ 
+          event.preventDefault();  
+          minimizeVideo();
+          mycameraCapturer.startVideoStream(); 
+        });
+        showVideoParameters();
       }else if(videoSources.length>1){
       
         log('select');
@@ -171,9 +176,17 @@
         videoSelect = document.getElementById('videoSource');
         videoSelect.onchange = function(){
           log('change'+videoSelect.value);
+          minimizeVideo();
           mycameraCapturer.startVideoStream(videoSelect.value);
         };
+        showVideoParameters();
       }
+    }
+
+    function minimizeVideo()
+    {
+      videoContainer.style.width = '1px';
+      videoContainer.style.height = '1px';
     }
 
     function resizeVideo()
@@ -296,7 +309,6 @@
       countDownTimeout = window.setTimeout(function() { instance(); }, speed);
     }
 
-
     function startFinalCountDown(){
       countdown = shootTime-serverTime;
       log('countdown : '+countdown);
@@ -304,16 +316,34 @@
     }
 
     function disableShootButton(){
-      buttonShoot.disabled = true;
+      if(typeof buttonShoot !== 'undefined'){
+        buttonShoot.disabled = true;
+      }
     }
 
     function enableShootButton(){
-      buttonShoot.disabled = false;
+      if(typeof buttonShoot !== 'undefined'){
+        buttonShoot.disabled = false;
+      }
     }
 
     function hideShootButton(){
-      buttonShoot.style.display = 'none';
+      if(typeof buttonShoot !== 'undefined'){
+        buttonShoot.style.display = 'none';
+      }
     }
+    function hideVideoParameters(){
+      if(typeof videoParameters !== 'undefined'){
+        videoParameters.style.display = 'none';
+      }
+    }
+
+    function showVideoParameters(){
+      if(typeof videoParameters !== 'undefined'){
+        videoParameters.style.display = 'block';
+      }
+    }
+
 
     function showTarget(){
       document.getElementById('target').style.display='block';
@@ -357,9 +387,11 @@
 
 
     function snapshot(){
-      hideShootButton();
+      if(shootMode === 'together'){
+        hideShootButton(); 
+      }
+      
       showAlertMessage(true,'Snap !!!');
-
       if (navigator.vibrate) {
         navigator.vibrate(200);
       }
@@ -375,7 +407,6 @@
         var drawSize = video.videoWidth;
         var topDraw = Math.round((video.videoHeight-video.videoWidth)/2);
         var leftDraw = 0;
-
       }
 
       if((userAgent.indexOf('firefox/43') > -1 || userAgent.indexOf('firefox/42') > -1) && userAgent.indexOf('android') > -1)
@@ -454,7 +485,6 @@
 
       htmlContent += '</select></div></section>';
 
-
       htmlContent += '<section class="form-block">';
       htmlContent += '<div><label for="loopMode">Loop mode</label></div>';
       htmlContent += '<div class="full-width"><select class="select white" id="loopMode">';
@@ -505,7 +535,6 @@
       if(buttonRegenerateGif){
         buttonRegenerateGif.addEventListener("click", function(event){ event.preventDefault();  regenerateGif(); });
       }
-
     }
 
     function regenerateGif(){
@@ -535,7 +564,6 @@
       });
     }
 
-
     function showAjustGifButton(){
       var htmlContent = '<button class="btn nomargin ajust-gif" id="buttonAjustGif" >Ajust gif</button>';
       videoParameters.innerHTML = htmlContent;
@@ -543,6 +571,7 @@
       if(buttonAjustGif){
         buttonAjustGif.addEventListener('click', function(event){ event.preventDefault();  showAjustGifForm(); });
       }
+      showVideoParameters();
     }
 
     function showRefreshGifButton(){
@@ -552,6 +581,7 @@
       if(buttonRefreshGif){
         buttonRefreshGif.addEventListener('click', function(event){ event.preventDefault();  RefreshGif(); });
       }
+      showVideoParameters();
     }
 
     function RefreshGif(){
@@ -591,9 +621,9 @@
       htmlContent +=  '<a class="twitter-share" href="https://twitter.com/intent/tweet?url='+siteBaseURL+'/gif.php?uuid='+shootId+'" target="_blank">Share on Twitter</a>';
       htmlContent +=  '<a class="google-share" href="https://plus.google.com/share?url='+siteBaseURL+'/gif.php?uuid='+shootId+'" target="_blank">Share on Google+</a></div>';
 
-      htmlContent +=  '<button class="btn" id="buttonJoinShoot" >Create another Shoot!</button>';
-      htmlContent +=  '<button class="btn" id="buttonCreateShoot" >Join another Shoot!</button>';
-      //console.log(formContainer);
+      //htmlContent +=  '<button class="btn" id="buttonJoinShoot" >Create another Shoot!</button>';
+      //htmlContent +=  '<button class="btn" id="buttonCreateShoot" >Join another Shoot!</button>';
+      
       formContainer.innerHTML = htmlContent;
       /*var buttonAnotherShoot = document.getElementById('buttonAnotherShoot');
       if(buttonAnotherShoot){
@@ -601,10 +631,7 @@
       }*/
     }
 
-
-
     function checkIfGifIsGenerated(){
-
       var data = new FormData();
       data.append('uuid', shootId);
 
@@ -618,11 +645,9 @@
             checkGifTimeout = window.setTimeout(checkIfGifIsGenerated, 2000);
           }
         }
-
       }).catch(function(e) {
         console.log(e);
       });
-
     }
 
 
@@ -639,7 +664,9 @@
         result.innerHTML = '';
         result.appendChild(newImg);
 
-        videoParameters.style.display = 'none';
+
+        mycameraCapturer.stopStream();
+        hideVideoParameters();
 
         var data = new FormData();
         data.append('uuid', shootId);
@@ -699,8 +726,13 @@
         }
         */
       }else if(shootMode === 'together'){
-        //showCreatForm();
         createShoot();
+      }else if(shootMode === 'joinTogether'){
+        if(shootTitle == ''){
+          showJoinForm();
+        }else{
+          console.log('----------------------------------'+shootTitle);
+        }
       }else{
 
       }
@@ -720,6 +752,19 @@
       }
     }*/
 
+    function showJoinForm()
+    {
+      var htmlContent = '<section class="form-block"><div><label for="titleExport">Shoot title</label></div>';
+      htmlContent += '<div class="full-width"><input class="form-control" type="text" id="titleExport" value="" /></div></section>';
+      htmlContent += '<button  class="btn" id="buttonJoinShoot" >Join Shoot</button>';
+
+      formContainer.innerHTML = htmlContent;
+
+      var buttonJoinShoot = document.getElementById('buttonJoinShoot');
+      if(buttonJoinShoot){
+        buttonJoinShoot.addEventListener("click", function(event){ event.preventDefault();  joinShoot(); });
+      }
+    }
 
     function ajaxCall(url, data){
 
@@ -749,6 +794,91 @@
       });
     }
 
+    function waitTheShoot(){
+      showAlertMessage(true, 'You well joined the shoot named : "'+shootTitle+'". Wait a minute ! The creator will shoot soon !');
+      formContainer.innerHTML = '';
+      checkShootTimeout = window.setTimeout(checkShoot, 1000);
+    }
+
+
+    function checkShoot(){
+      var data = new FormData();
+      data.append('uuid', shootId);
+
+      var previousGifFrames = gifFrames;
+      var clientTimestamp = Date.now();
+
+      ajaxCall('timer.php', data).then(function(response) {
+        // Code depending on result
+
+        if(response !== null && typeof response === 'object'){
+
+          if(response.status_code==1){
+            gifFrames = response.frames;
+
+            if(gifFrames != previousGifFrames){
+              updateCounter();
+            }
+            showAlertMessage(true,response.status);
+            checkShootTimeout = window.setTimeout(checkShoot, 1000);
+
+          }else if(response.status_code==2){
+
+            gifFrames = response.frames;
+
+            if(gifFrames != previousGifFrames){
+              updateCounter();
+            }
+
+            var nowTimeStamp = Date.now();
+            DeltaTime = Math.round((nowTimeStamp - clientTimestamp)/2);
+            serverTime = response.serverTimestamp+DeltaTime;
+            shootTime = response.shootTime*1000;
+            showAlertMessage(true,response.status);
+            startFinalCountDown();
+          }else{
+            showAlertMessage(false,response.status);
+          }
+        }
+
+      }).catch(function(e) {
+        console.log(e);
+      });
+
+    }
+
+
+
+    function joinShoot(){
+      log('joinShoot');
+
+      var data = new FormData();
+      var exportInputTitle = document.getElementById("titleExport");
+      var title = exportInputTitle.value;
+      //console.log(title);
+      data.append('title', title);
+
+      ajaxCall('join_shoot.php', data).then(function(response) {
+        // Code depending on result
+        if(response !== null && typeof response === 'object'){
+          if(response.status_code==1){
+            shootTitle = response.title;
+            shootId = response.uuid;
+            shooterId = response.userFrame;
+            gifFrames = response.userFrame;
+            ShowFrameCounter();
+            waitTheShoot();
+          }else{
+            showAlertMessage(false,response.status);
+          }
+        }
+
+      }).catch(function(e) {
+        console.log(e);
+      });
+
+    }
+
 
     function createShoot(){
 
@@ -765,7 +895,6 @@
             shooterId = response.userFrame;
             gifFrames = 1;
             gifOwner = true;
-
             ShowFrameCounter();
             checkShootTimeout = window.setTimeout(checkFrames, 1000);
             initShootButton();
@@ -816,10 +945,11 @@
       p.id = 'counter';
       videoParameters.appendChild(p);
       updateCounter();
+      showVideoParameters();
     }
 
     function updateCounter(){
-      if(shootMode === 'together'){
+      if(shootMode === 'together' || shootMode === 'joinTogether'){
         var counterHtml = shooterId+' / '+gifFrames;
       }
       document.getElementById('counter').innerHTML = counterHtml;
@@ -851,7 +981,7 @@
         showAlertMessage(true, 'Click on the start button to start the camera... Simple no ?');
         formContainer.innerHTML = '<button class="btn" id="buttonPlay" >Start Now !</button>';
         var buttonPlay = document.getElementById('buttonPlay');
-        buttonPlay.addEventListener('click', function(event){ event.preventDefault(); log('play click !'); mycameraCapturer.play(); });
+        buttonPlay.addEventListener('click', function(event){ event.preventDefault(); log('play click !'); mycameraCapturer.capturePlay(); });
       }
       events.off('streamSuccess', initPlayButton);
     }
@@ -924,7 +1054,7 @@
         captureVideo.onerror = function ()
         {
           log('captureVideo.onerror');
-          Pause();
+          capturePause();
         };
 
         captureVideo.oncanplay = function() {
@@ -956,7 +1086,7 @@
 
     }
 
-    function play()
+    function capturePlay()
     {
       if (captureVideo)
       {
@@ -965,20 +1095,27 @@
       }
     }
 
-    function pause()
+    function capturePause()
     {
       if (captureVideo)
       {
         log('pause');
-        captureVideo.Pause();
+        captureVideo.capturePause();
       }
     }
 
+    function stopStream()
+    {
+        if (captureStream) {
+          captureVideo.src = null;
+          //captureStream.stop();
+          captureStream.getTracks().forEach(function (track) { track.stop(); });
+        }   
+    }
 
 
     function streamSuccessCallback(stream) {
       log('successCallback');
-
       events.emit('streamSuccess', stream);
 
       gotStream(stream);
@@ -1006,7 +1143,7 @@
         {
           captureVideo.src = stream;
         }
-        captureVideo.play();
+        captureVideo.capturePlay();
       }else{
         log('captureVideo is Undefined');
       }
@@ -1021,16 +1158,11 @@
       }
       */
 
-
       events.on('videoSourcesAvailable', startVideoStream);
 
       function startVideoStream(streamId) {
         
-        if (captureStream) {
-          captureVideo.src = null;
-          //captureStream.stop();
-          captureStream.getTracks().forEach(function (track) { track.stop(); });
-        }
+        stopStream();
 
         if (typeof streamId === 'string' || streamId instanceof String)
         {
@@ -1186,8 +1318,9 @@
         init: init,
         startVideoStream: startVideoStream,
         checkIfVideoIsPlaying: checkIfVideoIsPlaying,
-        play: play,
-        pause: pause
+        capturePlay: capturePlay,
+        capturePause: capturePause,
+        stopStream: stopStream
       };
   };
 
