@@ -5,9 +5,6 @@
  *
  */
 
-
-
-
 //window.onload = function()
 //{
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -17,7 +14,11 @@
   {
     var preLog = document.getElementById('preLog');
     if (preLog){
-      preLog.textContent = (text) + '  ||  ' + preLog.textContent;
+      if(typeof text === 'object'){
+        preLog.textContent = JSON.stringify(text) + '  ||  ' + preLog.textContent;
+      }else{
+        preLog.textContent = (text) + '  ||  ' + preLog.textContent;
+      }
       console.log(text);
     }else{ 
       console.log(text);
