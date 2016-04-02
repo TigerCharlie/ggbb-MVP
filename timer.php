@@ -23,8 +23,7 @@ if(isset($_POST['uuid'])){
 		{
 			$serverTimestamp = round(microtime(true)*1000);
 			$shootTimestamp = strtotime($donnees['shoottime']);
-			
-			if($shootTimestamp>$serverTimestamp){
+			if($shootTimestamp<$serverTimestamp){
 				echo '{"serverTimestamp":'.$serverTimestamp.',"status_code":1,"status":"The shoot : \"'.$donnees['title'].'\". is not programmed yet.","title":"'.$donnees['title'].'","frames":'.$donnees['frames'].'}';
 			}else{
 				echo '{"serverTimestamp":'.$serverTimestamp.', "shootTime":'.$shootTimestamp.',"status_code":2,"status":"The shoot : \"'.$donnees['title'].'\". is programmed very soon.","title":"'.$donnees['title'].'","frames":'.$donnees['frames'].'}';
