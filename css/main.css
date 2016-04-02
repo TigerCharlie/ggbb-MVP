@@ -408,7 +408,7 @@ pre {
 .form-control {
   box-shadow: 0 0 2px 0 #aeaeae inset;
   display: block;
-  width: calc(100% - 18px);
+  width: calc(100% - 16px);
   padding: 0px 8px;
   font-size: 1rem;
   line-height: 42px;
@@ -534,9 +534,10 @@ pre {
 
 
  #video-parameters .white{
+    box-shadow: 0 0 2px 0 #aeaeae inset;
     display: block;
     width: 100%;
-    padding: 5px;
+    padding: 0px 5px;
     font-size: 1rem;
     line-height: 42px;
     height: 42px;

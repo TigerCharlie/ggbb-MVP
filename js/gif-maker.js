@@ -57,8 +57,11 @@
   var gifShooter = (function(){
   //gifShooter = function(){
     
-    var baseURL = '';
+    var url = window.location.href
+    var urlArr = url.split("/");
+    var siteBaseURL = urlArr[0] + "//" + urlArr[2];
 
+    //var siteBaseURL = '';
 
     var shootMode = 'alone';
     
@@ -69,6 +72,7 @@
     var gifOwner = false;
     var mycameraCapturer;
 
+    var shotBox;
     var video;
     var videoContainer;
 
@@ -78,6 +82,15 @@
 
     var videoSelect;
     
+    var canvas;
+    var ctx;
+
+    var frameSpeed = 20;
+    var loopType = 1;
+    var imgFilter = 1;
+
+    var buttonShoot;
+
     var userAgent = navigator.userAgent.toLowerCase();
 
     function showAlertMessage(good, alertText, hide){
@@ -85,17 +98,14 @@
       hide = typeof hide !== 'undefined' ? hide : false;
 
       if(hide){
-
         videoAlert.style.display = 'none';
-
       }else{
 
         if(good){
-          videoAlert.style.background='rgba(0,100,0,0.7)';
+          videoAlert.style.background = 'rgba(0,100,0,0.7)';
         }else{
-          videoAlert.style.background='rgba(238,0,0,0.7)';
+          videoAlert.style.background = 'rgba(238,0,0,0.7)';
         }
-
         videoAlert.innerHTML = alertText;
         videoAlert.style.display = 'block';
       }
@@ -119,16 +129,19 @@
       log('Your Browser is not cool enough to run this site please use Chrome, Firefox.');
     }
 
-    function init(currentShootMode, currentBaseURL) {
+    function init(currentShootMode) {
       //init dom elements 
-      baseURL = currentBaseURL;
+      //siteBaseURL = currentsiteBaseURL;
       shootMode = currentShootMode;
       console.log('init', shootMode);
+      shotBox = document.getElementById('shot-box');
       video = document.getElementById('video');
-      videoContainer = document.getElementById("container-video");
+      videoContainer = document.getElementById('container-video');
       videoAlert = document.getElementById('video-alert');
       videoParameters = document.getElementById('video-parameters');
       formContainer =  document.getElementById('form-container');
+      canvas = document.getElementById('canvas');
+      ctx = canvas.getContext('2d');
 
       //init camera capturer
       mycameraCapturer = cameraCapturer();
@@ -139,21 +152,20 @@
 
     function initVideoSourcesButton(videoSources) {
 
-      if(videoSources.length==0 || userAgent.indexOf('firefox') > -1){
+      if(videoSources.length == 0 || userAgent.indexOf('firefox') > -1){
         log('button');
         videoParameters.innerHTML = '<button class="btn nomargin camera-switch" type="button" id="buttonChange" >Change camera</button>';
         var buttonChange = document.getElementById('buttonChange');
-        buttonChange.addEventListener("click", function(event){ event.preventDefault();  mycameraCapturer.startVideoStream(); });
+        buttonChange.addEventListener('click', function(event){ event.preventDefault();  mycameraCapturer.startVideoStream(); });
       }else if(videoSources.length>1){
       
         log('select');
         var videoSourcesSelectHTML = '<select class="select nomargin camera-switch" id="videoSource">';
         
         for (var i = 0; i !== videoSources.length; ++i) {
-          videoSourcesSelectHTML += '<option value="'+videoSources[i].id+'">'+videoSources[i].label+'</option>';
+          videoSourcesSelectHTML +=  '<option value="'+videoSources[i].id+'">'+videoSources[i].label+'</option>';
         }
-
-        videoSourcesSelectHTML += '</select>';
+        videoSourcesSelectHTML +=  '</select>';
         videoParameters.innerHTML = videoSourcesSelectHTML;
         
         videoSelect = document.getElementById('videoSource');
@@ -166,34 +178,34 @@
 
     function resizeVideo()
     {    
-      var shotBoxWidth=document.getElementById('shot-box').clientWidth;
-      var videoContainerSize=shotBoxWidth;
+      var shotBoxWidth = shotBox.clientWidth;
+      var videoContainerSize = shotBoxWidth;
 
-      var videoWidth=video.videoWidth;
-      var videoHeight=video.videoHeight;
+      var videoWidth = video.videoWidth;
+      var videoHeight = video.videoHeight;
       
       log(shotBoxWidth+' / '+videoWidth+' / '+videoHeight+' / ');
 
       if(videoWidth>videoHeight){
         
-        var videoContainerwidth= Math.round(shotBoxWidth*(videoWidth/videoHeight));
-        var videoContainerHeight=shotBoxWidth;
-        var videoMarginTop=0;
-        var videoMarginLeft= Math.round((shotBoxWidth-videoContainerwidth)/2);
+        var videoContainerwidth =  Math.round(shotBoxWidth*(videoWidth/videoHeight));
+        var videoContainerHeight = shotBoxWidth;
+        var videoMarginTop = 0;
+        var videoMarginLeft =  Math.round((shotBoxWidth-videoContainerwidth)/2);
       }else{
 
-        var videoContainerwidth=shotBoxWidth;
-        var videoContainerHeight= Math.round(shotBoxWidth/(videoWidth/videoHeight));
-        var videoMarginLeft=0;
-        var videoMarginTop= Math.round((shotBoxWidth-videoContainerHeight)/2);
+        var videoContainerwidth = shotBoxWidth;
+        var videoContainerHeight =  Math.round(shotBoxWidth/(videoWidth/videoHeight));
+        var videoMarginLeft = 0;
+        var videoMarginTop =  Math.round((shotBoxWidth-videoContainerHeight)/2);
       }
 
       log(videoContainerwidth+' / '+videoContainerHeight+' / '+videoMarginLeft+' / '+videoMarginTop);
 
-      videoContainer.style.width = videoContainerwidth+"px";
-      videoContainer.style.height = videoContainerHeight+"px";
-      videoContainer.style.top = videoMarginTop+"px";
-      videoContainer.style.left = videoMarginLeft+"px";
+      videoContainer.style.width = videoContainerwidth+'px';
+      videoContainer.style.height = videoContainerHeight+'px';
+      videoContainer.style.top = videoMarginTop+'px';
+      videoContainer.style.left = videoMarginLeft+'px';
     }
 
 
@@ -203,6 +215,7 @@
     events.on('captureVideoOnPlay', ShowHidePlayButton);
     events.on('captureVideoOnPlay', initShootCreation);
 
+
     events.on('captureVideoOnPause', ShowHidePlayButton);
     events.on('captureVideoOnLoadedMetaData', resizeVideo);
 
@@ -211,13 +224,16 @@
     //timer function with normal/self-adjusting argument
     function timer(adjust, morework)
     {
+      console.log('timer');
       //create the timer speed, a counter and a starting timestamp
       var speed = 50,
       counter = 0, 
       shownCountDown = 0,
       start = new Date().getTime();
-        
-      window.clearTimeout(countDownTimeout);
+      
+      if(typeof countDownTimeout !== 'undefined'){
+        window.clearTimeout(countDownTimeout);
+      }
 
       //timer instance function
       function instance()
@@ -226,7 +242,7 @@
         //do some calculations to create more work
         if(morework)
         {
-          for(var x=1, i=0; i<1000000; i++) { x *= (i + 1); }
+          for(var x = 1, i = 0; i<1000000; i++) { x *=  (i + 1); }
         }
         
         //work out the real and ideal elapsed time
@@ -241,12 +257,12 @@
 
         countdown = shootTime-goodTime;
 
-        if(counter==0){
+        if(counter == 0){
           shownCountDown = Math.floor(countdown/1000);
           showAlertMessage(true,shownCountDown);
         }
 
-        if(shownCountDown!=Math.floor(countdown/1000)){
+        if(shownCountDown != Math.floor(countdown/1000)){
           shownCountDown = Math.floor(countdown/1000);
           if(shownCountDown>0){
             showAlertMessage(true,shownCountDown);
@@ -283,38 +299,57 @@
 
     function startFinalCountDown(){
       countdown = shootTime-serverTime;
-      log('countdown : '+countdown+);
+      log('countdown : '+countdown);
       timer(true, true);
+    }
+
+    function disableShootButton(){
+      buttonShoot.disabled = true;
+    }
+
+    function enableShootButton(){
+      buttonShoot.disabled = false;
+    }
+
+    function hideShootButton(){
+      buttonShoot.style.display = 'none';
+    }
+
+    function showTarget(){
+      document.getElementById('target').style.display='block';
     }
 
 
     function planShoot(){
+
+      disableShootButton();
+
       var data = new FormData();
       data.append('uuid', shootId);
 
       var clientTimestamp = Date.now();
+
       ajaxCall('shoot.php', data).then(function(response) {
 
         if(response !== null && typeof response === 'object'){
 
-          if(response.status_code==1){
+          if(response.status_code == 1){
             
             var nowTimeStamp = Date.now();
             DeltaTime = Math.round((nowTimeStamp - clientTimestamp)/2);
             serverTime = response.serverTimestamp+DeltaTime;
             shootTime = response.shootTime*1000;
-
             showAlertMessage(true,response.status);
-            
             startFinalCountDown();
             
           }else{
             showAlertMessage(false,response.status);
+            enableShootButton();
           }
         }
 
-      }).catch(function() {
-        log('bug!bug!bug!');
+      }).catch(function(e) {
+        console.log(e);
       });
     }
 
@@ -322,8 +357,7 @@
 
 
     function snapshot(){
-
-      document.getElementById('buttonShoot').disabled = true;
+      hideShootButton();
       showAlertMessage(true,'Snap !!!');
 
       if (navigator.vibrate) {
@@ -334,11 +368,9 @@
         canvas.height = 400;
 
       if(video.videoWidth>video.videoHeight){
-
         var drawSize = video.videoHeight;
         var topDraw = 0;
         var leftDraw = Math.round((video.videoWidth-video.videoHeight)/2);
-
       }else{
         var drawSize = video.videoWidth;
         var topDraw = Math.round((video.videoHeight-video.videoWidth)/2);
@@ -348,13 +380,10 @@
 
       if((userAgent.indexOf('firefox/43') > -1 || userAgent.indexOf('firefox/42') > -1) && userAgent.indexOf('android') > -1)
       {
-
         ctx.setTransform(1,0,0,-1,0,video.videoHeight-(drawSize/2));
          log('ff43 or ff42| V2');
-
       }else{
           log('not FF| V2');
-          
       }
 
       try {
@@ -367,10 +396,233 @@
     }
 
 
+    // dataURL to Blob
+    function dataURLToBlob(dataURL) {
+      var BASE64_MARKER = ';base64,';
+      if (dataURL.indexOf(BASE64_MARKER) ==  -1) {
+        var parts = dataURL.split(',');
+        var contentType = parts[0].split(':')[1];
+        var raw = decodeURIComponent(parts[1]);
+
+        return new Blob([raw], {type: contentType});
+      }
+
+      var parts = dataURL.split(BASE64_MARKER);
+      var contentType = parts[0].split(':')[1];
+      var raw = window.atob(parts[1]);
+      var rawLength = raw.length;
+
+      var uInt8Array = new Uint8Array(rawLength);
+
+      for (var i = 0; i < rawLength; ++i) {
+        uInt8Array[i] = raw.charCodeAt(i);
+      }
+
+      return new Blob([uInt8Array], {type: contentType});
+    }
+
+
     function convertCanvasToImage(canvas) {
         var image = new Image();
-        image.src = canvas.toDataURL("image/jpeg", 0.85);
+        image.src = canvas.toDataURL('image/jpeg', 0.85);
         return image;
+    }
+
+    function showAjustGifForm(){
+
+      log('showAjustGifForm');
+
+      var htmlContent = '<a id="buttonCloseAjustForm" class="close-btn" href="#">Close</a>';
+
+      htmlContent += '<section class="form-block">';
+      htmlContent += '<div><label for="imgFilter">Filter</label></div>';
+      htmlContent += '<div class="full-width"><select class="select white" id="imgFilter">';
+
+      switch(imgFilter) {
+      case 1:
+          htmlContent +='<option value="1" selected >No filter</option><option value="2">Black and white</option><option value="3">I\'m a geek</option>';
+          break;
+      case 2:
+          htmlContent +='<option value="1">No filter</option><option value="2" selected >Black and white</option><option value="3">I\'m a geek</option>';
+          break;
+      case 3:
+      htmlContent +='<option value="1">No filter</option><option value="2">Black and white</option><option value="3"  selected >I\'m a geek</option>';
+      break;
+      default:
+          htmlContent +='<option value="1" selected >No filter</option><option value="2">Black and white</option><option value="3">I\'m a geek</option>';
+      }
+
+      htmlContent += '</select></div></section>';
+
+
+      htmlContent += '<section class="form-block">';
+      htmlContent += '<div><label for="loopMode">Loop mode</label></div>';
+      htmlContent += '<div class="full-width"><select class="select white" id="loopMode">';
+
+      switch(loopType) {
+      case 1:
+          htmlContent +='<option value="1" selected >Go and back</option><option value="2">Infinite loop</option> <option value="3">3 loops</option>';
+          break;
+      case 2:
+          htmlContent +='<option value="1" >Go and back</option><option value="2" selected >Infinite loop</option> <option value="3">3 loops</option>';
+          break;
+      case 3:
+          htmlContent +='<option value="1">Go and back</option><option value="2">Infinite loop</option> <option value="3" selected >3 loops</option>';
+          break;
+      default:
+          htmlContent +='<option value="1" selected >Go and back</option><option value="2">Infinite loop</option> <option value="3">3 loops</option>';
+      }
+
+      htmlContent += '</select></div></section>';
+      htmlContent += '<section class="form-block">';
+      htmlContent += '<div><label for="frameSpeed">Images duration</label></div>';
+      htmlContent += '<div class="full-width"><input class="form-control" type="text" id="frameSpeed" value="'+frameSpeed+'" /></div></section>';
+      htmlContent += '<section class="form-block">';
+      htmlContent += '<div><label for="gifTitle">Gif Title</label></div>';
+      htmlContent += '<div class="full-width"><input class="form-control" type="text" id="gifTitle" value="'+shootTitle+'" /></div></section>';
+      htmlContent += '<input  class="btn nomargin center" type="button" id="buttonRegenerateGif" value="Regenerate Gif" />';
+      
+      videoParameters.innerHTML = htmlContent;
+
+      var frameSpeedInput = document.getElementById('frameSpeed');
+      frameSpeedInput.addEventListener("change",  function changeFrameSpeed(){ frameSpeed = parseInt(frameSpeedInput.value);  });
+
+      var loopModeSelect = document.getElementById('loopMode');
+      loopModeSelect.addEventListener("change",  function changeLoopMode(){ loopType = parseInt(loopModeSelect.value);  });
+
+      var imgFilterSelect = document.getElementById('imgFilter');
+      imgFilterSelect.addEventListener("change",  function changeFilter(){ imgFilter = parseInt(imgFilterSelect.value);  });
+
+      var gifTitleSelect = document.getElementById('gifTitle');
+      gifTitleSelect.addEventListener("change",  function changeFilter(){ shootTitle = gifTitleSelect.value;  });
+
+      var buttonCloseAjustForm = document.getElementById('buttonCloseAjustForm');
+      if(buttonCloseAjustForm){
+        buttonCloseAjustForm.addEventListener("click", function(event){ event.preventDefault();  showAjustGifButton(); });
+      }
+
+      var buttonRegenerateGif = document.getElementById('buttonRegenerateGif');
+      if(buttonRegenerateGif){
+        buttonRegenerateGif.addEventListener("click", function(event){ event.preventDefault();  regenerateGif(); });
+      }
+
+    }
+
+    function regenerateGif(){
+
+      var data = new FormData();
+      data.append('uuid', shootId);
+      data.append('frame_speed', frameSpeed);
+      data.append('loop_type', loopType);
+      data.append('img_filter', imgFilter);
+      data.append('title', shootTitle);
+
+      log('regenerateGif :'+frameSpeed);
+
+      ajaxCall('ajust_gif.php', data).then(function(response) {
+        // Code depending on result
+        if(response !== null && typeof response === 'object'){
+
+          if(response.status_code==1){
+            RefreshGif();
+            showAjustGifButton();
+          }else{
+            showAlertMessage(false,response.status);
+          }
+        }
+      }).catch(function(e) {
+        console.log(e);
+      });
+    }
+
+
+    function showAjustGifButton(){
+      var htmlContent = '<button class="btn nomargin ajust-gif" id="buttonAjustGif" >Ajust gif</button>';
+      videoParameters.innerHTML = htmlContent;
+      var buttonAjustGif = document.getElementById('buttonAjustGif');
+      if(buttonAjustGif){
+        buttonAjustGif.addEventListener('click', function(event){ event.preventDefault();  showAjustGifForm(); });
+      }
+    }
+
+    function showRefreshGifButton(){
+      var htmlContent = '<button class="btn nomargin" id="buttonRefreshGif" >Refresh gif</button>';
+      videoParameters.innerHTML = htmlContent;
+      var buttonRefreshGif = document.getElementById('buttonRefreshGif');
+      if(buttonRefreshGif){
+        buttonRefreshGif.addEventListener('click', function(event){ event.preventDefault();  RefreshGif(); });
+      }
+    }
+
+    function RefreshGif(){
+      var finalGif = document.getElementById('finalGif');
+      var previousGifSrc = finalGif.src;
+      if(previousGifSrc.indexOf('?')>0){
+        finalGif.src = '';
+        finalGif.src = previousGifSrc.substring(0, previousGifSrc.indexOf('?'))+'?'+Math.floor((Math.random() * 10000) + 1);
+      }else{
+        finalGif.src = '';
+        finalGif.src = previousGifSrc+'?'+Math.floor((Math.random() * 10000) + 1);
+      } 
+    }
+
+    function showFinalGif(gifUrl){
+
+      log('gif well done !');
+      var htmlContent  = '<img class="mygif" id="finalGif" src="'+gifUrl+'">';
+      htmlContent += '<div id="video-alert"></div>';
+      htmlContent += '<img class="notmygif" src="asset/not-my-gif.gif">';
+      htmlContent += '<div id="video-parameters"></div>';
+
+      shotBox.innerHTML = htmlContent;
+      shotBox.className = 'shot-box-end';
+
+      videoParameters = document.getElementById('video-parameters');
+      videoAlert = document.getElementById('video-alert');
+
+      showAlertMessage(true,'YEAAAAH !');
+
+      if(shootMode === 'together'){
+        showAjustGifButton();
+      }else if(shootMode === 'joinTogether'){
+        showRefreshGifButton();
+      }
+      var htmlContent = '<div class="share-btn"><a class="facebook-share" href="https://www.facebook.com/sharer.php?u='+siteBaseURL+'/gif.php?uuid='+shootId+'" target="_blank">Share on facebook</a>';
+      htmlContent +=  '<a class="twitter-share" href="https://twitter.com/intent/tweet?url='+siteBaseURL+'/gif.php?uuid='+shootId+'" target="_blank">Share on Twitter</a>';
+      htmlContent +=  '<a class="google-share" href="https://plus.google.com/share?url='+siteBaseURL+'/gif.php?uuid='+shootId+'" target="_blank">Share on Google+</a></div>';
+
+      htmlContent +=  '<button class="btn" id="buttonJoinShoot" >Create another Shoot!</button>';
+      htmlContent +=  '<button class="btn" id="buttonCreateShoot" >Join another Shoot!</button>';
+      //console.log(formContainer);
+      formContainer.innerHTML = htmlContent;
+      /*var buttonAnotherShoot = document.getElementById('buttonAnotherShoot');
+      if(buttonAnotherShoot){
+        buttonAnotherShoot.addEventListener('click', function reloadPage(event){  event.preventDefault(); location.reload();});
+      }*/
+    }
+
+
+
+    function checkIfGifIsGenerated(){
+
+      var data = new FormData();
+      data.append('uuid', shootId);
+
+      ajaxCall('check_gif.php', data).then(function(response) {
+        // Code depending on result
+        if(response !== null && typeof response === 'object'){
+          if(response.status_code == 1){
+            showFinalGif(response.gifUrl);
+          }else{
+            showAlertMessage(false,response.status);
+            checkGifTimeout = window.setTimeout(checkIfGifIsGenerated, 2000);
+          }
+        }
+
+      }).catch(function(e) {
+        console.log(e);
+      });
+
     }
 
 
@@ -383,11 +635,11 @@
       newImg.onload = function() {
         log('imgloaded');
 
-        var result = document.getElementById("result");
+        var result = document.getElementById('result');
         result.innerHTML = '';
         result.appendChild(newImg);
 
-        videoParameters.style.display='none';
+        videoParameters.style.display = 'none';
 
         var data = new FormData();
         data.append('uuid', shootId);
@@ -400,14 +652,14 @@
         showAlertMessage(true,'uploading image...');
 
         ajaxCall('save_img_and_generate_gif.php', data).then(function(response) {
-          // Code depending on result
 
           if(response !== null && typeof response === 'object'){
 
-            if(response.status_code==1){
-              log('img well uploaded!');
+            if(response.status_code == 1){
+              //log('img well uploaded!');
+              showAlertMessage(true,'Image well uploaded : waiting for gif generation.');
               checkGifTimeout = window.setTimeout(checkIfGifIsGenerated, 2000);
-            }else if(response.status_code==2){
+            }else if(response.status_code == 2){
               showFinalGif(response.gifUrl);
             }else{
               showAlertMessage(false,response.status);
@@ -415,40 +667,37 @@
             }
           }
 
-        }).catch(function() {
+        }).catch(function(e) {
           checkGifTimeout = window.setTimeout(checkIfGifIsGenerated, 2000);
-          log('bug!bug!bug!');
+          console.log(e);
         });
-
       };
-
     }
-
-
-
 
     function initShootCreation() {
       log('initiate Shoot ! in mode :'+shootMode);
+      showTarget();
       events.off('captureVideoOnPlay', initShootCreation);
-
       if (shootMode === 'alone'){
+        
         showAlertMessage(true, 'You can start shooting right now !');
+        /*
+        var htmlContent = '<button class="btn" id="buttonShoot" >SHOOT!</button>';
 
-        var htmlContent = '<button  class="btn" id="buttonShoot" >SHOOT!</button>';
-
-        htmlContent += '<button  class="btn" id="buttonGenerateGif" disabled >Generate gif</button>';
+        htmlContent +=  '<button class="btn" id="buttonGenerateGif" disabled >Generate gif</button>';
 
         formContainer.innerHTML = htmlContent;
 
         var buttonShoot = document.getElementById('buttonShoot');
         if(buttonShoot){
-          buttonShoot.addEventListener("click",  function(event){ event.preventDefault();  snapshot(); });
+          buttonShoot.addEventListener('click',  function(event){ event.preventDefault();  snapshot(); });
         }
 
         var buttonGenerate = document.getElementById('buttonGenerateGif');
         if(buttonGenerate){
-          buttonGenerate.addEventListener("click",  function(event){ event.preventDefault();  generateGif(); });
+          buttonGenerate.addEventListener('click',  function(event){ event.preventDefault();  generateGif(); });
         }
+        */
       }else if(shootMode === 'together'){
         //showCreatForm();
         createShoot();
@@ -463,11 +712,11 @@
     {
       var htmlContent = '<button  class="btn" id="buttonCreateShoot" >Create Shoot</button>';
 
-      document.getElementById('form-container').innerHTML = htmlContent;
+      formContainer.innerHTML = htmlContent;
 
       var buttonCreateShoot = document.getElementById('buttonCreateShoot');
       if(buttonCreateShoot){
-        buttonCreateShoot.addEventListener("click", function(event){ event.preventDefault();  createShoot(); });
+        buttonCreateShoot.addEventListener('click', function(event){ event.preventDefault();  createShoot(); });
       }
     }*/
 
@@ -480,16 +729,12 @@
         request.open('POST', url, true);
 
         request.onload = function() {
-          if (request.status >= 200 && request.status < 400) {
-            
+          if (request.status >=  200 && request.status < 400) {
             var response = JSON.parse(request.responseText);
             log(response);
-
             resolve(response);
-
           } else {
             // We reached our target server, but it returned an error
-            //return;
             log('server returns an error');
             reject;
           }
@@ -497,13 +742,10 @@
 
         request.onerror = function() {
           // There was a connection error of some sort
-          //return;
           log('XMLHttpRequest error');
           reject;
         };
-
         request.send(data);
-
       });
     }
 
@@ -517,7 +759,7 @@
 
         if(response !== null && typeof response === 'object'){
 
-          if(response.status_code==1){
+          if(response.status_code == 1){
             shootTitle = response.title;
             shootId = response.uuid;
             shooterId = response.userFrame;
@@ -532,8 +774,8 @@
           }
         }
 
-      }).catch(function() {
-        log('bug!bug!bug!');
+      }).catch(function(e) {
+        console.log(e);
       });
 
     }
@@ -549,31 +791,29 @@
 
         if(response !== null && typeof response === 'object'){
 
-          if(response.status_code == 1){
+          if(response.status_code ==  1){
             gifFrames = response.frames;
-            if(gifFrames != previousGifFrames){
+            if(gifFrames !=  previousGifFrames){
               updateCounter();
             }
             checkShootTimeout = window.setTimeout(checkFrames, 1000);
-          }else if(response.status_code==2){
+          }else if(response.status_code == 2){
 
           }else{
             checkShootTimeout = window.setTimeout(checkFrames, 1000);
           }
         }
 
-      }).catch(function() {
+      }).catch(function(e) {
         checkShootTimeout = window.setTimeout(checkFrames, 1000);
-        log('bug!bug!bug!');
+        console.log(e);
       });
     }
 
-
-
     function ShowFrameCounter(){
-      var p = document.createElement("p");
-      p.className = "counter";
-      p.id = "counter";
+      var p = document.createElement('p');
+      p.className = 'counter';
+      p.id = 'counter';
       videoParameters.appendChild(p);
       updateCounter();
     }
@@ -582,20 +822,20 @@
       if(shootMode === 'together'){
         var counterHtml = shooterId+' / '+gifFrames;
       }
-      document.getElementById("counter").innerHTML = counterHtml;
+      document.getElementById('counter').innerHTML = counterHtml;
     }
 
 
     function initShootButton(){
       if(shootMode === 'together'){
-        showAlertMessage(true, 'Shoot well created. Invite people to join your shoot : '+shootTitle+'... and SHOOT!<br>You can also send them this link :<br><input type="text" value="'+baseURL+'/together_mode.php?join=true&id='+shootId+'">');
+        showAlertMessage(true, 'Shoot well created. Invite people to join your shoot : '+shootTitle+'... and SHOOT!<br>You can also send them this link :<br><input type="text" value="'+siteBaseURL+'/together_mode.php?join=true&id='+shootId+'">');
       }
 
-      var htmlContent = '<input  class="btn" type="button" id="buttonShoot" value="SHOOT!" />';
-      document.getElementById('form-container').innerHTML = htmlContent;
-      var buttonShoot = document.getElementById('buttonShoot');
+      var htmlContent = '<button class="btn" id="buttonShoot" >SHOOT!</button>';
+      formContainer.innerHTML = htmlContent;
+      buttonShoot = document.getElementById('buttonShoot');
       if(buttonShoot){
-        buttonShoot.addEventListener("click",  function(event){ 
+        buttonShoot.addEventListener('click',  function(event){ 
           event.preventDefault();
           if(shootMode === 'together'){
             planShoot();
@@ -605,14 +845,13 @@
 
     }
 
-
     function initPlayButton() {
       var buttonPlay = document.getElementById('buttonPlay');
       if(!buttonPlay){
         showAlertMessage(true, 'Click on the start button to start the camera... Simple no ?');
         formContainer.innerHTML = '<button class="btn" id="buttonPlay" >Start Now !</button>';
         var buttonPlay = document.getElementById('buttonPlay');
-        buttonPlay.addEventListener("click", function(event){ event.preventDefault(); log('play click !'); mycameraCapturer.play(); });
+        buttonPlay.addEventListener('click', function(event){ event.preventDefault(); log('play click !'); mycameraCapturer.play(); });
       }
       events.off('streamSuccess', initPlayButton);
     }
@@ -620,17 +859,16 @@
     function ShowHidePlayButton() {
       log('ShowHidePlayButton');
       if (mycameraCapturer.checkIfVideoIsPlaying()) {
-        if(buttonPlay){
-          buttonPlay.style.display = "none";
+        if(typeof buttonPlay !== 'undefined'){
+          buttonPlay.style.display = 'none';
           showAlertMessage(true, '', true);
         }
       }else{
-        if(buttonPlay){
+        if(typeof buttonPlay !== 'undefined'){
           showAlertMessage(true, 'Click on the start button to start the camera... Simple no ?');
-          buttonPlay.style.display = "inline-block";
+          buttonPlay.style.display = 'inline-block';
         }
       }
- 
     }
 
     return {
@@ -652,7 +890,6 @@
     var getUserMediaSupport = false;
     var MediaStreamTrackSupport = false;
     var currentVideoSourceId;
-
 
     var errorCallback = function(e) {
       log(e);
@@ -902,7 +1139,7 @@
           var devicesList = [];
           navigator.mediaDevices.enumerateDevices()
           .then(function(devices) {
-            i=1;
+            i = 1;
             devices.forEach(function(device) {
               if(device.kind === 'videoinput'){
 
@@ -928,7 +1165,7 @@
 
         log('gotSources');
         var devicesList = [];
-        i=1;
+        i = 1;
         sourceInfos.forEach(function(sourceInfo) {
           if(sourceInfo.kind === 'video'){
             devicesList.push({label: sourceInfo.label || 'Camera ' +i, id: sourceInfo.id}); 

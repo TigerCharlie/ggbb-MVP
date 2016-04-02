@@ -93,7 +93,8 @@ include('includes/config.php'); ?>
           window.onload = function()
           { 
             if(gifShooter){
-              gifShooter.init('together', '<?php echo GGBB_URL;?>');
+              //gifShooter.init('together', '<?php echo GGBB_URL;?>');
+              gifShooter.init('together');
             } 
           }
         </script>
