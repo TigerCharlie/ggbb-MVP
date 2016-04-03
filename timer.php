@@ -24,7 +24,7 @@ if(isset($_POST['uuid'])){
 			$serverTimestamp = round(microtime(true)*1000);
 			
 			
-			if($donnees['shoottime'] == '0000-00-00 00:00:00'){
+			if($donnees['shoottime'] == '0000-00-00 00:00:00' or $donnees['shoottime'] == ''){
 				echo '{"serverTimestamp":'.$serverTimestamp.',"status_code":1,"status":"The shoot : \"'.$donnees['title'].'\". is not programmed yet.","title":"'.$donnees['title'].'","frames":'.$donnees['frames'].',"test":"'.$donnees['shoottime'].'"}';
 			}else{
 				$shootTimestamp = strtotime($donnees['shoottime']);
