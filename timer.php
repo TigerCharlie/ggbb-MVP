@@ -22,12 +22,13 @@ if(isset($_POST['uuid'])){
 		while ($donnees = $reponse->fetch())
 		{
 			$serverTimestamp = round(microtime(true)*1000);
-			$shootTimestamp = strtotime($donnees['shoottime']);
 			
-			if(!$shootTimestamp){
-				echo '{"serverTimestamp":'.$serverTimestamp.',"status_code":1,"status":"The shoot : \"'.$donnees['title'].'\". is not programmed yet.","title":"'.$donnees['title'].'","frames":'.$donnees['frames'].',"test":'.$donnees['shoottime'].'}';
+			
+			if($donnees['shoottime'] == '0000-00-00 00:00:00'){
+				echo '{"serverTimestamp":'.$serverTimestamp.',"status_code":1,"status":"The shoot : \"'.$donnees['title'].'\". is not programmed yet.","title":"'.$donnees['title'].'","frames":'.$donnees['frames'].',"test":"'.$donnees['shoottime'].'"}';
 			}else{
-				echo '{"serverTimestamp":'.$serverTimestamp.', "shootTime":'.$shootTimestamp.',"status_code":2,"status":"The shoot : \"'.$donnees['title'].'\". is programmed very soon.","title":"'.$donnees['title'].'","frames":'.$donnees['frames'].',"test":'.$donnees['shoottime'].'}';
+				$shootTimestamp = strtotime($donnees['shoottime']);
+				echo '{"serverTimestamp":'.$serverTimestamp.', "shootTime":'.$shootTimestamp.',"status_code":2,"status":"The shoot : \"'.$donnees['title'].'\". is programmed very soon.","title":"'.$donnees['title'].'","frames":'.$donnees['frames'].',"test":"'.$donnees['shoottime'].'"}';
 			}
 		}
 
