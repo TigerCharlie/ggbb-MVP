@@ -173,7 +173,6 @@ window.onload = function()
   }
   
   function ajaxCall(url, data){
-
     return new Promise(function(resolve, reject) {
 
       var request = new XMLHttpRequest();
@@ -821,10 +820,8 @@ function createShoot(){
       }
     }else{
       if(buttonPlay){
-
         showAlertMessage(true, 'Click on the start button to start the camera... Simple no ?');
-
-        buttonPlay.style.display = "block";
+        buttonPlay.style.display = "inline-block";
       }
     }
   }
@@ -1002,6 +999,7 @@ function createShoot(){
         }
       }
 
+      videoParameters.style.display='block';
       
       if ((typeof window === 'undefined') || (typeof navigator === 'undefined')) log('This page needs a Web browser with the objects window.* and navigator.*!');
       else if (!(video && canvas)) log('HTML context error!');

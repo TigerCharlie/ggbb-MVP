@@ -779,7 +779,7 @@ function continueShoot(){
 
         showAlertMessage(true, 'Click on the start button to start the camera... Simple no ?');
 
-        buttonPlay.style.display = "block";
+        buttonPlay.style.display = "inline-block";
       }
     }
   }
@@ -878,6 +878,7 @@ function continueShoot(){
         }
       }
 
+      videoParameters.style.display='block';
       
       if ((typeof window === 'undefined') || (typeof navigator === 'undefined')) log('This page needs a Web browser with the objects window.* and navigator.*!');
       else if (!(video && canvas)) log('HTML context error!');
