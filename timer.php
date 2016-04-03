@@ -25,9 +25,9 @@ if(isset($_POST['uuid'])){
 			$shootTimestamp = strtotime($donnees['shoottime']);
 			
 			if(!$shootTimestamp){
-				echo '{"serverTimestamp":'.$serverTimestamp.',"status_code":1,"status":"The shoot : \"'.$donnees['title'].'\". is not programmed yet.","title":"'.$donnees['title'].'","frames":'.$donnees['frames'].'}';
+				echo '{"serverTimestamp":'.$serverTimestamp.',"status_code":1,"status":"The shoot : \"'.$donnees['title'].'\". is not programmed yet.","title":"'.$donnees['title'].'","frames":'.$donnees['frames'].',"test":'.$donnees['shoottime'].'}';
 			}else{
-				echo '{"serverTimestamp":'.$serverTimestamp.', "shootTime":'.$shootTimestamp.',"status_code":2,"status":"The shoot : \"'.$donnees['title'].'\". is programmed very soon.","title":"'.$donnees['title'].'","frames":'.$donnees['frames'].'}';
+				echo '{"serverTimestamp":'.$serverTimestamp.', "shootTime":'.$shootTimestamp.',"status_code":2,"status":"The shoot : \"'.$donnees['title'].'\". is programmed very soon.","title":"'.$donnees['title'].'","frames":'.$donnees['frames'].',"test":'.$donnees['shoottime'].'}';
 			}
 		}
 
