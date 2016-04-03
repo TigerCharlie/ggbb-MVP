@@ -9,7 +9,7 @@ include('includes/db_connect.php');
 
 
 if(isset($_POST['title'])){
-	$title = $_POST['title'];
+	$title = strtolower($_POST['title']);
 
 	$reponse= $bdd->prepare('SELECT * FROM shoots WHERE title = :title AND active=1 LIMIT 1');
 	$reponse->execute(array(
