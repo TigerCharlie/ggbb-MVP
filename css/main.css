@@ -370,10 +370,26 @@ h1{
 
 .delete-gif{
   position: absolute;
+  display: block;
+  width: 42px;
   top: 0;
   right: 0;
   background: #ff0000;
   margin: 0;
+  height: 42px;
+}
+
+.alone-again{
+  position: absolute;
+  display: block;
+  width: 42px;
+  top: 42px;
+  right: 0;
+  margin: 0;
+  height: 42px;
+  padding: 0;
+  text-align: center;
+  line-height: 42px;
 }
 
 
@@ -428,11 +444,6 @@ pre {
   padding: 0;
   margin:0 0 10px 0;
 }
-
-
-
-
-
 
 .form-block div{
   display: table-cell;
@@ -532,9 +543,7 @@ pre {
   white-space: nowrap;
 }
 
-
-
- #video-parameters .white{
+#video-parameters .white{
     box-shadow: 0 0 2px 0 #aeaeae inset;
     display: block;
     width: 100%;
@@ -547,10 +556,7 @@ pre {
     background-image: none;
     border-radius: 0 0.25rem 0.25rem 0;
     margin:0;
- }
-
-
-
+}
 
 
 #video-parameters .counter{

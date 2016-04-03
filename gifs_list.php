@@ -82,12 +82,12 @@ include('includes/config.php');
         $thumbnail_url = 'img/'.$donnees['thumbnail'];
 
         if($donnees['type']=='alone'){
-            $again_button='<a href="alone_mode_again.php?uuid='.$donnees['uuid'].'" class="btn">C</a>';
+            $again_button='<a href="alone_mode_again.php?uuid='.$donnees['uuid'].'" title="continue this shoot" class="btn alone-again">C</a>';
         }else{
             $again_button="";
         }
 
-        echo '<li id="'.$donnees['uuid'].'"><a href="gif.php?uuid='.$donnees['uuid'].'"><figure><img src="'.$thumbnail_url.'" alt="'.$donnees['title'].'" ><figcaption>'.$donnees['title'].'</figcaption><button data-uuid="'.$donnees['uuid'].'" class="btn delete-gif" type="button">X</button>'.$again_button.'</figure></a></li>';
+        echo '<li id="'.$donnees['uuid'].'"><a href="gif.php?uuid='.$donnees['uuid'].'"><figure><img src="'.$thumbnail_url.'" alt="'.$donnees['title'].'" ><figcaption>'.$donnees['title'].'</figcaption><button data-uuid="'.$donnees['uuid'].'" class="btn delete-gif" title="delete this gif">X</button>'.$again_button.'</figure></a></li>';
       }
     }else{
       echo '<li>No gif available</li>';
