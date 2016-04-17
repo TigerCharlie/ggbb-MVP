@@ -834,8 +834,6 @@ function createShoot(){
 
   function showJoinForm()
   {
-
-
     var htmlContent = '<section class="form-block"><div><label for="titleExport">Shoot title</label></div>';
     htmlContent += '<div class="full-width"><input class="form-control" type="text" id="titleExport" value="" /></div></section>';
     htmlContent += '<input  class="btn" type="button" id="buttonCreateShoot" value="Create Shoot" />';

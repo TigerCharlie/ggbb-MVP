@@ -4,7 +4,7 @@
   <ul>
     <li><a href="index.php">Homepage</a></li>
     <li><a href="create_together.php">Create a shoot with friends</a></li>
-    <li><a href="join_together_mode.php">Join a shoot with friends</a></li>
+    <li><a href="join_together.php">Join a shoot with friends</a></li>
     <li><a href="alone_mode.php">Alone Mode</a></li>
     <li><a href="gifs_list.php">All Gifs</a></li>
   </ul>

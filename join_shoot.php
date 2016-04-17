@@ -8,13 +8,26 @@ include('includes/config.php');
 include('includes/db_connect.php');
 
 
-if(isset($_POST['title'])){
-	$title = strtolower($_POST['title']);
 
-	$reponse= $bdd->prepare('SELECT * FROM shoots WHERE title = :title AND active=1 LIMIT 1');
-	$reponse->execute(array(
-					'title' => $title
-					));
+
+if(isset($_POST['title'])||isset($_POST['uuid'])){
+
+	if(isset($_POST['uuid'])){
+		$uuid = $_POST['uuid'];
+		$reponse= $bdd->prepare('SELECT * FROM shoots WHERE uuid = :uuid AND active=1 LIMIT 1');
+		$reponse->execute(array(
+						'uuid' => $uuid
+						));
+	}else{
+		$title = strtolower($_POST['title']);
+		$reponse= $bdd->prepare('SELECT * FROM shoots WHERE title = :title AND active=1 LIMIT 1');
+		$reponse->execute(array(
+						'title' => $title
+						));
+	}
+
+
+	
 
 
 	/*$reponse = $bdd->query('SELECT * FROM shoots WHERE title=$title');*/
@@ -29,7 +42,7 @@ if(isset($_POST['title'])){
 
 			$uuid = $donnees['uuid'];
 			$frames = $donnees['frames']+1;
-
+			$title =  $donnees['title'];
 
 			$req = $bdd->prepare('UPDATE shoots SET frames = :frames WHERE uuid = :uuid');
 			$req->execute(array(
@@ -41,12 +54,11 @@ if(isset($_POST['title'])){
 		}
 
 	}else{
-
 		//echo 'le shoot '.$title.' n\'exist pas';
-		echo '{"status_code":0,"status":"the shoot named \"'.$title.'\" doesn\'t exist.","title":"'.$title.'"}';
+		echo '{"status_code":0,"status":"this shoot doesn\'t exist.","title":"'.$title.',"uuid":"'.$uuid.'"}';
 	}
 }else{	
 	//echo 'le titre n\'a pas été transmi';
-	echo '{"status_code":-1,"status":"the server never reveved the title."}';
+	echo '{"status_code":-1,"status":"the server never received data."}';
 }
 ?>

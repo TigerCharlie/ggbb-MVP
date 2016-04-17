@@ -2,7 +2,9 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-include('includes/config.php'); ?>
+include('includes/config.php');
+
+?>
 <!doctype html>
     <head>
         <meta charset="utf-8">
@@ -74,11 +76,29 @@ include('includes/config.php'); ?>
     </div> 
     </body>
     <script type="text/javascript">
+        <?php 
+        if(isset($_GET['id'])){
+          $uuid = $_GET['id']; ?>
+
+          window.onload = function()
+          { 
+            if(gifShooter){
+              gifShooter.init('joinTogetherWithLink', '<?php echo $uuid;?>');
+            } 
+          }
+
+        <?php }else{ ?>
+
           window.onload = function()
           { 
             if(gifShooter){
               gifShooter.init('joinTogether');
             } 
           }
+
+        <?php } ?>
+
+
+          
         </script>
 </html>
