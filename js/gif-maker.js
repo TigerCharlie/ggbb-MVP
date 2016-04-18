@@ -131,7 +131,7 @@
       log('Your Browser is not cool enough to run this site please use Chrome, Firefox.');
     }
 
-    function init(currentShootMode) {
+    function init(currentShootMode, currentShootId) {
       //init dom elements 
       //siteBaseURL = currentsiteBaseURL;
       shootMode = currentShootMode;
@@ -144,6 +144,11 @@
       formContainer =  document.getElementById('form-container');
       canvas = document.getElementById('canvas');
       ctx = canvas.getContext('2d');
+
+      if (typeof currentShootId !== 'undefined') {
+        shootId = currentShootId;
+      }
+
 
       //init camera capturer
       mycameraCapturer = cameraCapturer();
@@ -508,10 +513,10 @@
       htmlContent += '</select></div></section>';
       htmlContent += '<section class="form-block">';
       htmlContent += '<div><label for="frameSpeed">Images duration</label></div>';
-      htmlContent += '<div class="full-width"><input class="form-control" type="text" id="frameSpeed" value="'+frameSpeed+'" /></div></section>';
+      htmlContent += '<div class="full-width"><input onClick="this.setSelectionRange(0, this.value.length)" class="form-control" type="text" id="frameSpeed" value="'+frameSpeed+'" /></div></section>';
       htmlContent += '<section class="form-block">';
       htmlContent += '<div><label for="gifTitle">Gif Title</label></div>';
-      htmlContent += '<div class="full-width"><input class="form-control" type="text" id="gifTitle" value="'+shootTitle+'" /></div></section>';
+      htmlContent += '<div class="full-width"><input onClick="this.setSelectionRange(0, this.value.length)" class="form-control" type="text" id="gifTitle" value="'+shootTitle+'" /></div></section>';
       htmlContent += '<input  class="btn nomargin center" type="button" id="buttonRegenerateGif" value="Regenerate Gif" />';
       
       videoParameters.innerHTML = htmlContent;
@@ -707,8 +712,7 @@
       log('initiate Shoot ! in mode :'+shootMode);
       showTarget();
       events.off('captureVideoOnPlay', initShootCreation);
-      if (shootMode === 'alone'){
-        
+      if (shootMode === 'alone'){ 
         showAlertMessage(true, 'You can start shooting right now !');
         /*
         var htmlContent = '<button class="btn" id="buttonShoot" >SHOOT!</button>';
@@ -735,6 +739,9 @@
         }else{
           console.log('----------------------------------'+shootTitle);
         }
+      }else if(shootMode === 'joinTogetherWithLink'){
+        //console.log('++++++++++++++++++++++++++++++++++++++++++'+shootId);
+        joinShoot(shootId);
       }else{
 
       }
@@ -851,14 +858,19 @@
 
 
 
-    function joinShoot(){
-      log('joinShoot');
+    function joinShoot(currentShootId){
 
+      log('joinShoot');
       var data = new FormData();
-      var exportInputTitle = document.getElementById("titleExport");
-      var title = exportInputTitle.value;
-      //console.log(title);
-      data.append('title', title);
+
+      if (typeof currentShootId !== 'undefined') {
+        data.append('uuid', currentShootId);
+      }else{
+        var exportInputTitle = document.getElementById("titleExport");
+        var title = exportInputTitle.value;
+        //console.log(title);
+        data.append('title', title);
+      }
 
       ajaxCall('join_shoot.php', data).then(function(response) {
         // Code depending on result
@@ -866,8 +878,8 @@
           if(response.status_code==1){
             shootTitle = response.title;
             shootId = response.uuid;
-            shooterId = response.userFrame;
-            gifFrames = response.userFrame;
+            shooterId = parseInt(response.userFrame);
+            gifFrames = parseInt(response.userFrame);
             ShowFrameCounter();
             waitTheShoot();
           }else{
@@ -951,8 +963,10 @@
     }
 
     function updateCounter(){
-      if(shootMode === 'together' || shootMode === 'joinTogether'){
+      if(shootMode === 'together' || shootMode === 'joinTogether' || shootMode === 'joinTogetherWithLink'){
         var counterHtml = shooterId+' / '+gifFrames;
+      }else{
+        var counterHtml = '';
       }
       document.getElementById('counter').innerHTML = counterHtml;
     }
@@ -960,7 +974,7 @@
 
     function initShootButton(){
       if(shootMode === 'together'){
-        showAlertMessage(true, 'Shoot well created. Invite people to join your shoot : '+shootTitle+'... and SHOOT!<br>You can also send them this link :<br><input type="text" value="'+siteBaseURL+'/together_mode.php?join=true&id='+shootId+'">');
+        showAlertMessage(true, 'Shoot well created. Invite people to join your shoot : '+shootTitle+'... and SHOOT!<br>You can also send them this link :<br><input onClick="this.setSelectionRange(0, this.value.length)" type="text" value="'+siteBaseURL+'/join_together.php?id='+shootId+'">');
       }
 
       var htmlContent = '<button class="btn" id="buttonShoot" >SHOOT!</button>';
