@@ -11,9 +11,7 @@ if(isset($_FILES['file']) and !$_FILES['file']['error']){
 
 		$uuid = $_POST['uuid'];
 		$frame = $_POST['frame'];
-
 		$fname = $uuid.'-'.$frame.'.jpg';
-
 
 		$moved = move_uploaded_file($_FILES['file']['tmp_name'], "img/" . $fname);
 

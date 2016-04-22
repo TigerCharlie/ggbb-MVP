@@ -282,7 +282,7 @@
           showAlertMessage(true,shownCountDown);
         }
 
-        if(shownCountDown != Math.floor(countdown/1000)){
+        if(shownCountDown !== Math.floor(countdown/1000)){
           shownCountDown = Math.floor(countdown/1000);
           if(shownCountDown>0){
             showAlertMessage(true,shownCountDown);
@@ -459,7 +459,7 @@
     }
 
     function convertCanvasToImage(canvas) {
-        var image = new Image();
+        var image = new Image(400,400);
         image.src = canvas.toDataURL('image/jpeg', 0.85);
         return image;
     }
@@ -542,6 +542,40 @@
       }
     }
 
+
+    function generateGif(){
+      log('generateGif');
+
+      showAlertMessage(true,'Generating Gif');
+      var htmlContent = '';
+      document.getElementById('form-container').innerHTML = htmlContent;
+
+      mycameraCapturer.stopStream();
+
+      var data = new FormData();
+      data.append('uuid', shootId);
+
+      ajaxCall('generate_gif.php', data).then(function(response) {
+        
+        if(response !== null && typeof response === 'object'){
+          if(response.status_code==1){
+            showFinalGif(response.gifUrl);
+          }else{
+            showAlertMessage(false,response.status);
+          }
+        }
+
+      }).catch(function() {
+        console.log(e);
+      });
+    }
+
+
+
+
+
+
+
     function regenerateGif(){
 
       var data = new FormData();
@@ -554,7 +588,6 @@
       log('regenerateGif :'+frameSpeed);
 
       ajaxCall('ajust_gif.php', data).then(function(response) {
-        // Code depending on result
         if(response !== null && typeof response === 'object'){
 
           if(response.status_code==1){
@@ -617,7 +650,7 @@
 
       showAlertMessage(true,'YEAAAAH !');
 
-      if(shootMode === 'together'){
+      if(shootMode === 'together' || shootMode === 'alone'){
         showAjustGifButton();
       }else if(shootMode === 'joinTogether'){
         showRefreshGifButton();
@@ -641,7 +674,7 @@
       data.append('uuid', shootId);
 
       ajaxCall('check_gif.php', data).then(function(response) {
-        // Code depending on result
+        
         if(response !== null && typeof response === 'object'){
           if(response.status_code == 1){
             showFinalGif(response.gifUrl);
@@ -665,21 +698,23 @@
       newImg.onload = function() {
         log('imgloaded');
 
-        var result = document.getElementById('result');
-        result.innerHTML = '';
-        result.appendChild(newImg);
+        var data = new FormData();
 
-        if(shootMode != 'alone'){
+        if(shootMode !== 'alone'){
           mycameraCapturer.stopStream();
           hideVideoParameters();
+          currentFrame = shooterId;
+        }else{
+          var result = document.getElementById('result');
+          result.innerHTML = null;
+          result.appendChild(newImg);
+          currentFrame = gifFrames+1;
         }
 
-        var data = new FormData();
-        data.append('uuid', shootId);
-        data.append('frame', shooterId);
+        var title = shootId+'-'+currentFrame+'.jpg';
 
-        var title = shootId+'-'+shooterId+'.jpg';
-
+        data.append('uuid', shootId); 
+        data.append('frame', currentFrame);
         data.append('file', dataURLToBlob(newImg.src), title);
         /// send image
         showAlertMessage(true,'uploading image...');
@@ -822,7 +857,6 @@
       checkShootTimeout = window.setTimeout(checkShoot, 1000);
     }
 
-
     function checkShoot(){
       var data = new FormData();
       data.append('uuid', shootId);
@@ -831,14 +865,14 @@
       var clientTimestamp = Date.now();
 
       ajaxCall('timer.php', data).then(function(response) {
-        // Code depending on result
+        
 
         if(response !== null && typeof response === 'object'){
 
           if(response.status_code==1){
             gifFrames = response.frames;
 
-            if(gifFrames != previousGifFrames){
+            if(gifFrames !== previousGifFrames){
               updateCounter();
             }
             showAlertMessage(true,response.status);
@@ -848,7 +882,7 @@
 
             gifFrames = response.frames;
 
-            if(gifFrames != previousGifFrames){
+            if(gifFrames !== previousGifFrames){
               updateCounter();
             }
 
@@ -869,8 +903,6 @@
 
     }
 
-
-
     function joinShoot(currentShootId){
 
       log('joinShoot');
@@ -886,7 +918,7 @@
       }
 
       ajaxCall('join_shoot.php', data).then(function(response) {
-        // Code depending on result
+        
         if(response !== null && typeof response === 'object'){
           if(response.status_code==1){
             shootTitle = response.title;
@@ -927,7 +959,7 @@
             }
             gifOwner = true;
             ShowFrameCounter();
-            if(shootMode != 'alone'){
+            if(shootMode !== 'alone'){
               checkShootTimeout = window.setTimeout(checkFrames, 1000);
             }
             initShootButton();
@@ -949,13 +981,13 @@
 
       var clientTimestamp = Date.now(); 
       ajaxCall('timer.php', data).then(function(response) {
-        // Code depending on result
+        
 
         if(response !== null && typeof response === 'object'){
 
           if(response.status_code ==  1){
             gifFrames = response.frames;
-            if(gifFrames !=  previousGifFrames){
+            if(gifFrames !==  previousGifFrames){
               updateCounter();
             }
             checkShootTimeout = window.setTimeout(checkFrames, 1000);
@@ -986,6 +1018,9 @@
         var counterHtml = shooterId+' / '+gifFrames;
       }else if (shootMode === 'alone'){
         var counterHtml = gifFrames;
+        if(gifFrames > 1){
+          document.getElementById('buttonGenerateGif').disabled = false;
+        }
       }else{
         var counterHtml = '';
       }
@@ -1027,7 +1062,7 @@
       if(buttonGenerate){
         buttonGenerate.addEventListener('click',  function(event){ 
           event.preventDefault();
-          //planShoot();
+          generateGif();
         });
       }
       showAlertMessage(true, 'You can start shooting right now !');

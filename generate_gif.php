@@ -5,7 +5,6 @@ ini_set('display_errors', 1);
 
 include('includes/config.php');
 
-
 	if( isset($_POST['uuid']) ){
 
 		$uuid = $_POST['uuid'];
