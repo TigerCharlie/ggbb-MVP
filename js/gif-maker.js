@@ -648,7 +648,14 @@
       videoParameters = document.getElementById('video-parameters');
       videoAlert = document.getElementById('video-alert');
 
-      showAlertMessage(true,'YEAAAAH !');
+      if(shootMode === 'alone'){
+        showAlertMessage(true,'YEAAAAH ! <a href="'+siteBaseURL+'/alone_mode_again.php?uuid='+shootId+'">Continue this gif</a>');
+      }else{
+        showAlertMessage(true,'YEAAAAH !');
+      }
+      
+
+      
 
       if(shootMode === 'together' || shootMode === 'alone'){
         showAjustGifButton();
