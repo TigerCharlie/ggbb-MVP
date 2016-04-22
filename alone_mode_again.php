@@ -42,7 +42,7 @@ if(isset($_GET['uuid'])){
         <meta name="viewport" content="width=device-width, initial-scale=1">
        
         <link rel="stylesheet" href="css/main.css?<?php echo date('l jS \of F Y h:i:s A'); ?>">
-        <script src="js/alone-again.js?<?php echo date('l jS \of F Y h:i:s A'); ?>"></script>
+        <script src="js/gif-maker.js?<?php echo date('l jS \of F Y h:i:s A'); ?>"></script>
 
 
         <link rel="icon" type="image/png" href="asset/favicon.png" />
@@ -82,9 +82,6 @@ if(isset($_GET['uuid'])){
     
     <div class="container">
 
-    
-
-
     <?php include('header.php'); ?>
     
     <?php
@@ -93,8 +90,6 @@ if(isset($_GET['uuid'])){
 
 
          ?>
-
-
 
         <div id="shot-box" class="shot-box" data-uuid="<?php echo $donnees['uuid'];  ?>" data-frames="<?php echo $donnees['frames']; ?>" data-title="<?php echo $donnees['title']; ?>">
         <div id="video-alert"></div>
@@ -105,10 +100,18 @@ if(isset($_GET['uuid'])){
         </div>
       </div>
 
-
       <div id="form-container">
-        <input  class="btn" type="button" id="buttonPlay" value="Start Now !"/>
       </div>
+
+      <script type="text/javascript">
+        window.onload = function()
+        { 
+          if(gifShooter){
+            gifShooter.init('aloneAgain', '<?php echo $uuid;?>');
+          } 
+        }
+      </script>
+
       <?php 
       if(isset($_GET['debug'])) {
           echo '<pre id="preLog" class="last">Loading…</pre>';
