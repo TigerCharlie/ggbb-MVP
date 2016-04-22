@@ -759,23 +759,9 @@
       events.off('captureVideoOnPlay', initShootCreation);
       if (shootMode === 'alone'){
         createShoot();
-        /*
-        var htmlContent = '<button class="btn" id="buttonShoot" >SHOOT!</button>';
-
-        htmlContent +=  '<button class="btn" id="buttonGenerateGif" disabled >Generate gif</button>';
-
-        formContainer.innerHTML = htmlContent;
-
-        var buttonShoot = document.getElementById('buttonShoot');
-        if(buttonShoot){
-          buttonShoot.addEventListener('click',  function(event){ event.preventDefault();  snapshot(); });
-        }
-
-        var buttonGenerate = document.getElementById('buttonGenerateGif');
-        if(buttonGenerate){
-          buttonGenerate.addEventListener('click',  function(event){ event.preventDefault();  generateGif(); });
-        }
-        */
+      }else if(shootMode === 'aloneAgain'){
+        //console.log('++++++++++++++++++++++++++++++++++++++++++'+shootId);
+        continueShoot();
       }else if(shootMode === 'together'){
         createShoot();
         showTarget();
@@ -788,7 +774,6 @@
         }
       }else if(shootMode === 'joinTogetherWithLink'){
         showTarget();
-        //console.log('++++++++++++++++++++++++++++++++++++++++++'+shootId);
         joinShoot(shootId);
       }else{
 
@@ -796,18 +781,26 @@
 
     }
 
-    /*
-    function showCreatForm()
-    {
-      var htmlContent = '<button  class="btn" id="buttonCreateShoot" >Create Shoot</button>';
+    function continueShoot(){
 
-      formContainer.innerHTML = htmlContent;
+        shootTitle = shotBox.dataset.title;
+        shootId = shotBox.dataset.uuid;
+        shooterId = 1;
+        gifFrames = parseInt(shotBox.dataset.frames);
 
-      var buttonCreateShoot = document.getElementById('buttonCreateShoot');
-      if(buttonCreateShoot){
-        buttonCreateShoot.addEventListener('click', function(event){ event.preventDefault();  createShoot(); });
-      }
-    }*/
+        gifOwner = true;
+
+        
+
+        var result = document.getElementById("result");
+        result.innerHTML = '<img src="img/'+shotBox.dataset.uuid+'-'+shotBox.dataset.frames+'.jpg">';
+
+        shootMode = 'alone';
+        ShowFrameCounter();
+
+        initShootButton();
+    }
+
 
     function showJoinForm()
     {
@@ -865,7 +858,6 @@
       var clientTimestamp = Date.now();
 
       ajaxCall('timer.php', data).then(function(response) {
-        
 
         if(response !== null && typeof response === 'object'){
 
@@ -1018,8 +1010,9 @@
         var counterHtml = shooterId+' / '+gifFrames;
       }else if (shootMode === 'alone'){
         var counterHtml = gifFrames;
-        if(gifFrames > 1){
-          document.getElementById('buttonGenerateGif').disabled = false;
+        buttonGenerateGif = document.getElementById('buttonGenerateGif');
+        if(gifFrames > 1 && buttonGenerateGif){
+          buttonGenerateGif.disabled = false;
         }
       }else{
         var counterHtml = '';

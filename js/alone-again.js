@@ -159,7 +159,7 @@ window.onload = function()
     }else{
       finalGif.src = '';
       finalGif.src = previousGifSrc+'?'+Math.floor((Math.random() * 10000) + 1);
-    } 
+    }
   }
   
   function ajaxCall(url, data){
@@ -538,7 +538,6 @@ function continueShoot(){
 
         var result = document.getElementById("result");
         result.innerHTML = '<img src="img/'+shotBox.dataset.uuid+'-'+shotBox.dataset.frames+'.jpg">';
-
 
         readyToShoot();
 
