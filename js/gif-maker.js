@@ -339,6 +339,7 @@
         buttonShoot.style.display = 'none';
       }
     }
+
     function hideVideoParameters(){
       if(typeof videoParameters !== 'undefined'){
         videoParameters.style.display = 'none';
@@ -350,7 +351,6 @@
         videoParameters.style.display = 'block';
       }
     }
-
 
     function showTarget(){
       document.getElementById('target').style.display='block';
@@ -390,12 +390,11 @@
       });
     }
 
-
-
-
     function snapshot(){
       if(shootMode === 'together'){
-        hideShootButton(); 
+        hideShootButton();
+      } else if(shootMode === 'alone'){
+        disableShootButton();
       }
       
       showAlertMessage(true,'Snap !!!');
@@ -403,8 +402,8 @@
         navigator.vibrate(200);
       }
 
-        canvas.width = 400;
-        canvas.height = 400;
+      canvas.width = 400;
+      canvas.height = 400;
 
       if(video.videoWidth>video.videoHeight){
         var drawSize = video.videoHeight;
@@ -458,7 +457,6 @@
 
       return new Blob([uInt8Array], {type: contentType});
     }
-
 
     function convertCanvasToImage(canvas) {
         var image = new Image();
@@ -671,9 +669,10 @@
         result.innerHTML = '';
         result.appendChild(newImg);
 
-
-        mycameraCapturer.stopStream();
-        hideVideoParameters();
+        if(shootMode != 'alone'){
+          mycameraCapturer.stopStream();
+          hideVideoParameters();
+        }
 
         var data = new FormData();
         data.append('uuid', shootId);
@@ -685,14 +684,27 @@
         /// send image
         showAlertMessage(true,'uploading image...');
 
-        ajaxCall('save_img_and_generate_gif.php', data).then(function(response) {
+        if(shootMode === 'alone'){
+          exportURL = 'save_img.php';
+        }else{
+          exportURL = 'save_img_and_generate_gif.php';
+        }
+
+        ajaxCall(exportURL, data).then(function(response) {
 
           if(response !== null && typeof response === 'object'){
-
             if(response.status_code == 1){
               //log('img well uploaded!');
-              showAlertMessage(true,'Image well uploaded : waiting for gif generation.');
-              checkGifTimeout = window.setTimeout(checkIfGifIsGenerated, 2000);
+              if(shootMode === 'alone'){
+                showAlertMessage(true,'Image well uploaded');
+                gifFrames = response.uploaded_frames;
+                updateCounter();
+                enableShootButton();
+                //console.log('--------'+gifFrames);
+              }else{
+                showAlertMessage(true,'Image well uploaded : waiting for gif generation.');
+                checkGifTimeout = window.setTimeout(checkIfGifIsGenerated, 2000);
+              }
             }else if(response.status_code == 2){
               showFinalGif(response.gifUrl);
             }else{
@@ -700,7 +712,6 @@
               checkGifTimeout = window.setTimeout(checkIfGifIsGenerated, 2000);
             }
           }
-
         }).catch(function(e) {
           checkGifTimeout = window.setTimeout(checkIfGifIsGenerated, 2000);
           console.log(e);
@@ -710,10 +721,9 @@
 
     function initShootCreation() {
       log('initiate Shoot ! in mode :'+shootMode);
-      showTarget();
       events.off('captureVideoOnPlay', initShootCreation);
-      if (shootMode === 'alone'){ 
-        showAlertMessage(true, 'You can start shooting right now !');
+      if (shootMode === 'alone'){
+        createShoot();
         /*
         var htmlContent = '<button class="btn" id="buttonShoot" >SHOOT!</button>';
 
@@ -733,13 +743,16 @@
         */
       }else if(shootMode === 'together'){
         createShoot();
+        showTarget();
       }else if(shootMode === 'joinTogether'){
+        showTarget();
         if(shootTitle == ''){
           showJoinForm();
         }else{
           console.log('----------------------------------'+shootTitle);
         }
       }else if(shootMode === 'joinTogetherWithLink'){
+        showTarget();
         //console.log('++++++++++++++++++++++++++++++++++++++++++'+shootId);
         joinShoot(shootId);
       }else{
@@ -907,10 +920,16 @@
             shootTitle = response.title;
             shootId = response.uuid;
             shooterId = response.userFrame;
-            gifFrames = 1;
+            if (shootMode === 'alone'){
+              gifFrames = 0;
+            }else{
+              gifFrames = 1;
+            }
             gifOwner = true;
             ShowFrameCounter();
-            checkShootTimeout = window.setTimeout(checkFrames, 1000);
+            if(shootMode != 'alone'){
+              checkShootTimeout = window.setTimeout(checkFrames, 1000);
+            }
             initShootButton();
           }else{
             //showAlertMessage(false,response.status);
@@ -965,12 +984,13 @@
     function updateCounter(){
       if(shootMode === 'together' || shootMode === 'joinTogether' || shootMode === 'joinTogetherWithLink'){
         var counterHtml = shooterId+' / '+gifFrames;
+      }else if (shootMode === 'alone'){
+        var counterHtml = gifFrames;
       }else{
         var counterHtml = '';
       }
       document.getElementById('counter').innerHTML = counterHtml;
     }
-
 
     function initShootButton(){
       if(shootMode === 'together'){
@@ -985,10 +1005,32 @@
           event.preventDefault();
           if(shootMode === 'together'){
             planShoot();
+          } else if (shootMode === 'alone'){
+            //console.log('shoot !!!!!');
+            snapshot();
           }
         });
       }
+      if(shootMode === 'alone'){
+        initGenerateButton();
+      }
+    }
 
+    function initGenerateButton(){
+      console.log('initGenerateButton');
+      var htmlContent = '<button  class="btn" type="button" id="buttonGenerateGif"  type="button" disabled >Generate gif</button>';
+      
+      buttonShoot = document.getElementById('buttonShoot');
+      buttonShoot.insertAdjacentHTML('afterend', htmlContent);
+      //formContainer.appendChild(htmlContent);
+      buttonGenerate = document.getElementById('buttonGenerateGif');
+      if(buttonGenerate){
+        buttonGenerate.addEventListener('click',  function(event){ 
+          event.preventDefault();
+          //planShoot();
+        });
+      }
+      showAlertMessage(true, 'You can start shooting right now !');
     }
 
     function initPlayButton() {

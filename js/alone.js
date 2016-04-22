@@ -645,9 +645,6 @@ function createShoot(){
     }
 
 
-
-
-
       canvas.width = 400;
       canvas.height = 400;
 

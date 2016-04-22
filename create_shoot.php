@@ -42,21 +42,15 @@ function CheckIfTitleExist($title)
 
 }
 
-
-
 	if(isset($_POST['title'])){
 		$title = $_POST['title'];
 		CreateShoot($title, $type);
-	}else{	
-
+	}else{
 		do {
 		    $title = randomTitle();
 		} while (CheckIfTitleExist($title));
-		CreateShoot($title, $type);
-			
+		CreateShoot($title, $type);		
 	}
-
-
 
 function CreateShoot($title, $type)
 {	

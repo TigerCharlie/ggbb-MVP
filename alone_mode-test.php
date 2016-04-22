@@ -7,12 +7,12 @@ include('includes/config.php'); ?>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title><?php echo 'Together mode - '.GGBB_ON_TITLE; ?></title>
+        <title><?php echo 'alone mode - '.GGBB_ON_TITLE; ?></title>
         <meta name="description" content="<?php echo GGBB_DESCRIPTION; ?>">
         <meta name="viewport" content="width=device-width, initial-scale=1">
        
         <link rel="stylesheet" href="css/main.css?<?php echo date('l jS \of F Y h:i:s A'); ?>">
-
+        
         <script src="js/gif-maker.js?<?php echo date('l jS \of F Y h:i:s A'); ?>"></script>
 
         <link rel="icon" type="image/png" href="asset/favicon.png" />
@@ -41,11 +41,10 @@ include('includes/config.php'); ?>
         <link rel="apple-touch-startup-image" media="(device-width: 320px)" href="asset/apple-touch-startup-image-320x460.png">
         <link rel="apple-touch-startup-image" media="(device-width: 320px) and (-webkit-device-pixel-ratio: 2)" href="asset/apple-touch-startup-image-640x920.png">
 
-
-        <meta property="og:site_name"   content="<?php echo GGBB_ON_TITLE; ?>">
-        <meta property="og:url"         content="<?php echo $url_origin.'/together_mode.php'; ?>">
-        <meta property="og:title"       content="<?php echo 'Together mode - '.GGBB_ON_TITLE; ?>">
-        <meta property="og:description" content="<?php echo 'Shoot gif with your friends and share !'; ?>">
+        <meta property="og:site_name"   content="<?php echo GGBB_SITE_NAME; ?>">
+        <meta property="og:url"         content="<?php echo GGBB_DESCRIPTION; ?>">
+        <meta property="og:title"       content="<?php echo 'alone mode - '.GGBB_ON_TITLE; ?>">
+        <meta property="og:description" content="Shoot gif alone and share !">
 
         
     </head>
@@ -57,8 +56,7 @@ include('includes/config.php'); ?>
       <div id="shot-box" class="shot-box">
         <div id="video-alert"></div>
         <div id="video-parameters"></div>
-        <img class="target" id="target" src="asset/target.png">
-        <div id="result"><canvas id="canvas"></canvas></div>
+        <div id="result" class="transparent"><canvas id="canvas"></canvas></div>
         <div id="container-video" class="container-video">
           <video id="video" autoplay="autoplay"></video>
         </div>
@@ -66,19 +64,20 @@ include('includes/config.php'); ?>
 
 
       <div id="form-container">
+        <button class="btn" type="button" id="buttonPlay">Start Now !</button>
       </div>
       <?php 
       if(isset($_GET['debug'])) {
           echo '<pre id="preLog" class="last">Loading…</pre>';
       }
       ?>
-    </div> 
+    </div>  
     </body>
     <script type="text/javascript">
       window.onload = function()
       { 
         if(gifShooter){
-          gifShooter.init('together');
+          gifShooter.init('alone');
         } 
       }
     </script>
