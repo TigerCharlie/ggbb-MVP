@@ -91,6 +91,10 @@
     var loopType = 1;
     var imgFilter = 1;
 
+    var videoModeShootInterval = 500;
+    var videoModeCountdown = 5000;
+    var videoModeImagesList = [];
+
     var buttonShoot;
 
     var userAgent = navigator.userAgent.toLowerCase();
@@ -242,8 +246,10 @@
     
     //////////////////////////////////////////////////////////////////////////////////////
     //timer function with normal/self-adjusting argument
-    function timer(adjust, morework)
+    function timer(adjust, morework, interval)
     {
+      interval = typeof interval !== 'undefined' ? interval : 0;
+
       console.log('timer');
       //create the timer speed, a counter and a starting timestamp
       var speed = 50,
@@ -280,7 +286,17 @@
         if(counter == 0){
           shownCountDown = Math.floor(countdown/1000);
           showAlertMessage(true,shownCountDown);
+          if(interval > 0){
+            events.emit('countdownIntervalEvent', false);
+            nextCountdownInterval = countdown-interval;
+          } 
         }
+
+        if(interval > 0 && countdown <= nextCountdownInterval && nextCountdownInterval > 0){
+          nextCountdownInterval = nextCountdownInterval-interval;
+          events.emit('countdownIntervalEvent', false);
+        }
+
 
         if(shownCountDown !== Math.floor(countdown/1000)){
           shownCountDown = Math.floor(countdown/1000);
@@ -291,14 +307,15 @@
         
         //increment the counter
         counter++;
+        //console.log(countdown);
 
-        console.log(countdown);
-
-        if(countdown<0){
+        if(countdown <= 0){
+          events.emit('countdownEnd',true);
           window.clearTimeout(countDownTimeout);
-          snapshot();
+          showAlertMessage(true,'Snap !!!');
+          //snapshot(true);
         }else{
-            //calculate and display the difference
+          //calculate and display the difference
           var diff = (ideal - real);
           //form.diff.value = diff;
           //if the adjust flag is true
@@ -316,8 +333,9 @@
       countDownTimeout = window.setTimeout(function() { instance(); }, speed);
     }
 
-    function startFinalCountDown(){
-      countdown = shootTime-serverTime;
+    function startFinalCountDown(currentCountdown){
+      //countdown = shootTime-serverTime;
+      countdown = currentCountdown;
       log('countdown : '+countdown);
       timer(true, true);
     }
@@ -377,8 +395,11 @@
             serverTime = response.serverTimestamp+DeltaTime;
             shootTime = response.shootTime*1000;
             showAlertMessage(true,response.status);
-            startFinalCountDown();
-            
+            //startFinalCountDown(shootTime-serverTime);
+            countdown = shootTime-serverTime;
+            log('countdown : '+countdown);
+            timer(true, true);
+            events.on('countdownEnd', snapshot);
           }else{
             showAlertMessage(false,response.status);
             enableShootButton();
@@ -390,16 +411,17 @@
       });
     }
 
-    function snapshot(){
+    function snapshot(vibrate){
       if(shootMode === 'together'){
         hideShootButton();
       } else if(shootMode === 'alone'){
         disableShootButton();
       }
       
-      showAlertMessage(true,'Snap !!!');
-      if (navigator.vibrate) {
-        navigator.vibrate(200);
+      if(vibrate){
+        if (navigator.vibrate) {
+          navigator.vibrate(200);
+        }
       }
 
       canvas.width = 400;
@@ -429,7 +451,12 @@
         log('bug firefox'+e);
         throw e;
       }
-      exportCanvas();
+
+      if(shootMode === 'aloneVideo'){
+        return canvas;
+      }else{
+        exportCanvas();
+      }
     }
 
 
@@ -769,6 +796,9 @@
       }else if(shootMode === 'aloneAgain'){
         //console.log('++++++++++++++++++++++++++++++++++++++++++'+shootId);
         continueShoot();
+      }else if(shootMode === 'aloneVideo'){
+        //console.log('++++++++++++++++++++++++++++++++++++++++++'+shootId);
+        initShootButton();
       }else if(shootMode === 'together'){
         createShoot();
         showTarget();
@@ -890,7 +920,11 @@
             serverTime = response.serverTimestamp+DeltaTime;
             shootTime = response.shootTime*1000;
             showAlertMessage(true,response.status);
-            startFinalCountDown();
+            //startFinalCountDown(shootTime-serverTime);
+            countdown = shootTime-serverTime;
+            log('countdown : '+countdown);
+            timer(true, true);
+            events.on('countdownEnd', snapshot);
           }else{
             showAlertMessage(false,response.status);
           }
@@ -1042,14 +1076,61 @@
             planShoot();
           } else if (shootMode === 'alone'){
             //console.log('shoot !!!!!');
-            snapshot();
+            showAlertMessage(true,'Snap !!!');
+            snapshot(true);
+          } else if (shootMode === 'aloneVideo'){
+            VideoShoot();
           }
+
         });
       }
       if(shootMode === 'alone'){
         initGenerateButton();
       }
     }
+
+
+    function VideoShoot(){
+
+      serverTime = Date.now();
+      shootTime = serverTime+videoModeCountdown;
+      //startFinalCountDown(videoModeCountdown);
+
+      events.on('countdownEnd', addImage);
+      events.on('countdownIntervalEvent', addImage);
+
+      countdown = videoModeCountdown;
+      timer(true, true, videoModeShootInterval);
+
+    }
+
+    function addImage(isLast){
+      
+      console.log('addImage');
+
+      var newImg = convertCanvasToImage(snapshot(false));
+
+      newImg.onload = function() {
+        videoModeImagesList.push(newImg);
+
+        if(isLast){
+          //console.log(videoModeImagesList[0]);
+          events.off('countdownEnd', addImage);
+          events.off('countdownIntervalEvent', addImage);
+          generateVideoGif();
+        }
+      }   
+    }
+
+    function generateVideoGif(){
+      
+      for(var i in videoModeImagesList)
+      {
+           console.log(videoModeImagesList[i]);
+      }
+
+    }
+
 
     function initGenerateButton(){
       console.log('initGenerateButton');
