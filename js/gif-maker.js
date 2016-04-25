@@ -1106,7 +1106,7 @@
 
     function addImage(isLast){
       
-      console.log('addImage');
+      //console.log('addImage');
 
       var newImg = convertCanvasToImage(snapshot(false));
 
@@ -1124,11 +1124,35 @@
 
     function generateVideoGif(){
       
+      var data = new FormData();
+
       for(var i in videoModeImagesList)
       {
-           console.log(videoModeImagesList[i]);
+           console.log(videoModeImagesList[i].src);
+           var title = i+'.jpg';
+           data.append('file'+i, dataURLToBlob(videoModeImagesList[i].src), title);
       }
 
+      data.append('frames', videoModeImagesList.length);
+
+      data.append('type', 'aloneVideo');
+
+      showAlertMessage(true,'uploading images...');
+
+        ajaxCall('generate_video_gif.php', data).then(function(response) {
+
+          if(response !== null && typeof response === 'object'){
+            if(response.status_code == 1){
+              showFinalGif(response.gifUrl);
+            /*}else if(response.status_code == 2){
+              showFinalGif(response.gifUrl);*/
+            }else{
+              showAlertMessage(false,response.status);
+            }
+          }
+        }).catch(function(e) {
+          console.log(e);
+        });
     }
 
 
