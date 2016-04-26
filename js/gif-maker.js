@@ -1142,6 +1142,8 @@
 
           if(response !== null && typeof response === 'object'){
             if(response.status_code == 1){
+              shootTitle = response.title;
+              shootId = response.uuid;
               showFinalGif(response.gifUrl);
             }else{
               showAlertMessage(false,response.status);
