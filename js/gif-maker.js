@@ -684,7 +684,7 @@
 
       
 
-      if(shootMode === 'together' || shootMode === 'alone'){
+      if(shootMode === 'together' || shootMode === 'alone' ||  shootMode === 'aloneVideo' ){
         showAjustGifButton();
       }else if(shootMode === 'joinTogether'){
         showRefreshGifButton();
@@ -1144,8 +1144,6 @@
           if(response !== null && typeof response === 'object'){
             if(response.status_code == 1){
               showFinalGif(response.gifUrl);
-            /*}else if(response.status_code == 2){
-              showFinalGif(response.gifUrl);*/
             }else{
               showAlertMessage(false,response.status);
             }
