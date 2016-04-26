@@ -61,8 +61,8 @@ include('includes/config.php'); ?>
         </ul>
     <h1>Or shoot gif alone :</h1>
         <ul>
-            <li><a class="btn center margin-bottom" href="alone_mode-video.php">from a video</a></li>
-            <li><a class="btn center margin-bottom" href="alone_mode.php">frame by frame</a></li>
+            <li><a class="btn center margin-bottom" href="alone_mode-video.php">Video mode</a></li>
+            <li><a class="btn center margin-bottom" href="alone_mode.php">Frame by frame</a></li>
         </ul>  
     </div>  
     </body>
