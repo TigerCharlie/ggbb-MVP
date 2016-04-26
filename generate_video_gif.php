@@ -85,7 +85,7 @@ function CreateShoot($title, $type, $frames)
 {	
 
 	$uuid = base_convert(time(), 10, 36);
-	$active = 0;
+	$active = 1;
 	$uploaded_frames = $frames;
 
 	global $bdd;
