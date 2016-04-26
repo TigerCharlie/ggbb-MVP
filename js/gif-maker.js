@@ -980,7 +980,6 @@
       ajaxCall('create_shoot.php', data).then(function(response) {
 
         if(response !== null && typeof response === 'object'){
-
           if(response.status_code == 1){
             shootTitle = response.title;
             shootId = response.uuid;
@@ -1092,6 +1091,7 @@
 
     function VideoShoot(){
 
+      disableShootButton();
       serverTime = Date.now();
       shootTime = serverTime+videoModeCountdown;
       //startFinalCountDown(videoModeCountdown);
@@ -1101,11 +1101,9 @@
 
       countdown = videoModeCountdown;
       timer(true, true, videoModeShootInterval);
-
     }
 
     function addImage(isLast){
-      
       //console.log('addImage');
 
       var newImg = convertCanvasToImage(snapshot(false));
@@ -1117,6 +1115,7 @@
           //console.log(videoModeImagesList[0]);
           events.off('countdownEnd', addImage);
           events.off('countdownIntervalEvent', addImage);
+          mycameraCapturer.stopStream();
           generateVideoGif();
         }
       }   
