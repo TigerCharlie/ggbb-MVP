@@ -70,6 +70,7 @@
     var shootTitle = '';
     var shootId = '';
     var shooterId;
+    var gifFramesOffset;
     var gifFrames;
     var gifOwner = false;
     var mycameraCapturer;
@@ -313,7 +314,7 @@
           events.emit('countdownEnd',true);
           window.clearTimeout(countDownTimeout);
           showAlertMessage(true,'Snap !!!');
-          //snapshot(true);
+          
         }else{
           //calculate and display the difference
           var diff = (ideal - real);
@@ -400,6 +401,7 @@
             log('countdown : '+countdown);
             timer(true, true);
             events.on('countdownEnd', snapshot);
+            events.on('countdownEnd', hideShootButton);
           }else{
             showAlertMessage(false,response.status);
             enableShootButton();
@@ -411,12 +413,7 @@
       });
     }
 
-    function snapshot(vibrate){
-      if(shootMode === 'together'){
-        hideShootButton();
-      } else if(shootMode === 'alone'){
-        disableShootButton();
-      }
+    function snapshot(vibrate, returnCanvas){
       
       if(vibrate){
         if (navigator.vibrate) {
@@ -452,7 +449,7 @@
         throw e;
       }
 
-      if(shootMode === 'aloneVideo'){
+      if(returnCanvas){
         return canvas;
       }else{
         exportCanvas();
@@ -569,14 +566,15 @@
       }
     }
 
-
     function generateGif(){
       log('generateGif');
-
       showAlertMessage(true,'Generating Gif');
       var htmlContent = '';
       document.getElementById('form-container').innerHTML = htmlContent;
 
+      generateVideoGif('alone');
+
+      /*
       mycameraCapturer.stopStream();
 
       var data = new FormData();
@@ -594,12 +592,8 @@
 
       }).catch(function() {
         console.log(e);
-      });
+      });*/
     }
-
-
-
-
 
 
 
@@ -819,22 +813,18 @@
     }
 
     function continueShoot(){
-
         shootTitle = shotBox.dataset.title;
         shootId = shotBox.dataset.uuid;
         shooterId = 1;
-        gifFrames = parseInt(shotBox.dataset.frames);
+        gifFrames = 0;
+        gifFramesOffset = parseInt(shotBox.dataset.frames);
 
         gifOwner = true;
 
-        
-
         var result = document.getElementById("result");
         result.innerHTML = '<img src="img/'+shotBox.dataset.uuid+'-'+shotBox.dataset.frames+'.jpg">';
-
         shootMode = 'alone';
         ShowFrameCounter();
-
         initShootButton();
     }
 
@@ -925,6 +915,7 @@
             log('countdown : '+countdown);
             timer(true, true);
             events.on('countdownEnd', snapshot);
+            events.on('countdownEnd', hideShootButton);
           }else{
             showAlertMessage(false,response.status);
           }
@@ -989,6 +980,7 @@
             }else{
               gifFrames = 1;
             }
+            gifFramesOffset = 0;
             gifOwner = true;
             ShowFrameCounter();
             if(shootMode !== 'alone'){
@@ -1003,7 +995,6 @@
       }).catch(function(e) {
         console.log(e);
       });
-
     }
 
     function checkFrames(){
@@ -1014,7 +1005,6 @@
       var clientTimestamp = Date.now(); 
       ajaxCall('timer.php', data).then(function(response) {
         
-
         if(response !== null && typeof response === 'object'){
 
           if(response.status_code ==  1){
@@ -1049,15 +1039,18 @@
       if(shootMode === 'together' || shootMode === 'joinTogether' || shootMode === 'joinTogetherWithLink'){
         var counterHtml = shooterId+' / '+gifFrames;
       }else if (shootMode === 'alone'){
-        var counterHtml = gifFrames;
+        var counterHtml = gifFramesOffset+gifFrames;
         buttonGenerateGif = document.getElementById('buttonGenerateGif');
-        if(gifFrames > 1 && buttonGenerateGif){
+        if((gifFrames > 1||(gifFrames > 0 && gifFramesOffset > 0)) && buttonGenerateGif){
           buttonGenerateGif.disabled = false;
         }
       }else{
         var counterHtml = '';
       }
-      document.getElementById('counter').innerHTML = counterHtml;
+      counterBox = document.getElementById('counter');
+      if(counterBox){
+        counterBox.innerHTML = counterHtml;
+      }
     }
 
     function initShootButton(){
@@ -1076,11 +1069,12 @@
           } else if (shootMode === 'alone'){
             //console.log('shoot !!!!!');
             showAlertMessage(true,'Snap !!!');
-            snapshot(true);
+            //snapshot(true);
+            //disableShootButton();
+            addImage(false,true,true);
           } else if (shootMode === 'aloneVideo'){
             VideoShoot();
           }
-
         });
       }
       if(shootMode === 'alone'){
@@ -1088,9 +1082,7 @@
       }
     }
 
-
     function VideoShoot(){
-
       disableShootButton();
       serverTime = Date.now();
       shootTime = serverTime+videoModeCountdown;
@@ -1103,38 +1095,52 @@
       timer(true, true, videoModeShootInterval);
     }
 
-    function addImage(isLast){
-      //console.log('addImage');
-
-      var newImg = convertCanvasToImage(snapshot(false));
+    function addImage(isLast, vibrate, filigrane){
+      console.log('addImage');
+      vibrate = typeof vibrate !== 'undefined' ? vibrate : false;
+      filigrane = typeof filigrane !== 'undefined' ? filigrane : false;
+      var newImg = convertCanvasToImage(snapshot(vibrate,true));
 
       newImg.onload = function() {
         videoModeImagesList.push(newImg);
+        //console.log(videoModeImagesList.length);
+
+        if(filigrane){
+          var result = document.getElementById('result');
+          result.innerHTML = null;
+          result.appendChild(newImg);
+        }
+
+        gifFrames = videoModeImagesList.length;
+        updateCounter();
 
         if(isLast){
+          //console.log('is last!!!!!!!!!!');
           //console.log(videoModeImagesList[0]);
           events.off('countdownEnd', addImage);
           events.off('countdownIntervalEvent', addImage);
           mycameraCapturer.stopStream();
-          generateVideoGif();
+          generateVideoGif('aloneVideo');
         }
       }   
     }
 
-    function generateVideoGif(){
-      
+    function generateVideoGif(gifType){      
       var data = new FormData();
-
       for(var i in videoModeImagesList)
       {
-           console.log(videoModeImagesList[i].src);
            var title = i+'.jpg';
+           console.log(title, videoModeImagesList[i].src);
            data.append('file'+i, dataURLToBlob(videoModeImagesList[i].src), title);
+      }
+
+      if(gifFramesOffset>0){
+        data.append('uuid', shootId);
       }
 
       data.append('frames', videoModeImagesList.length);
 
-      data.append('type', 'aloneVideo');
+      data.append('type', gifType);
 
       showAlertMessage(true,'uploading images...');
 
@@ -1422,8 +1428,8 @@
         captureVideo = thisCaptureVideo;
 
         // enable getUserMedia
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-        window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
+        navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+        window.URL = (window.URL || window.webkitURL || window.mozURL || window.msURL);
 
         if (!navigator.getUserMedia) {
           events.emit('getUserMediaNotSupported');

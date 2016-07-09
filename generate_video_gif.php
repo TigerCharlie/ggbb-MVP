@@ -7,7 +7,6 @@ include('includes/config.php');
 include('includes/db_connect.php');
 
 
-
 if(isset($_POST['type'])){
 	$type = $_POST['type'];
 }else{
@@ -20,14 +19,24 @@ if(isset($_POST['frames'])){
 	$frames = 2;
 }
 
-if(isset($_POST['title'])){
-	$title = $_POST['title'];
-	CreateShoot($title, $type, $frames);
+if( isset($_POST['uuid']) ){
+
+	$uuid = $_POST['uuid'];
+	//$img_suffixe="";
+
+	ContinueShoot($uuid, $frames);
+
 }else{
-	do {
-	    $title = randomTitle();
-	} while (CheckIfTitleExist($title));
-	CreateShoot($title, $type, $frames);		
+
+	if(isset($_POST['title'])){
+		$title = $_POST['title'];
+		CreateShoot($title, $type, $frames);
+	}else{
+		do {
+		    $title = randomTitle();
+		} while (CheckIfTitleExist($title));
+		CreateShoot($title, $type, $frames);		
+	}
 }
 
 function moveImage($fileName, $imageName)
@@ -40,10 +49,10 @@ function moveImage($fileName, $imageName)
 	}
 }
 
-function moveImages($frames, $uuid)
+function moveImages($frames, $uuid, $frames_offset)
 {
 	for ($i = 0; $i < $frames; $i++) {
-		$fname = $uuid.'-'.round($i+1).'.jpg';
+		$fname = $uuid.'-'.round($frames_offset+$i+1).'.jpg';
 		$fileName = 'file'.$i;
 		//$moved = move_uploaded_file($_FILES['file']['tmp_name'], "img/" . $fname);
 		if(!moveImage($fileName, $fname)){
@@ -52,8 +61,6 @@ function moveImages($frames, $uuid)
 	}
 	return true;
 }
-
-
 
 function randomTitle()
 {
@@ -104,7 +111,7 @@ function CreateShoot($title, $type, $frames)
     		//die(mysql_error());
 		} else{	
 			//echo '{"status_code":1,"status":"Le shoot named : '.$title.' is created.", "title":"'.$title.'", "userFrame":1 ,"uuid":"'.$uuid.'"}';
-			if (moveImages($frames, $uuid)){
+			if (moveImages($frames, $uuid,0)){
 
 				$gif_frames = array();
 				$durations = array();
@@ -140,12 +147,79 @@ function CreateShoot($title, $type, $frames)
 
 
 			}else{
-				'{"status_code":0,"status":"Images can NOT be moved.","uuid":"'.$uuid.'"}';
+				echo '{"status_code":0,"status":"Images can NOT be moved.","uuid":"'.$uuid.'"}';
 			}
 			
 			//$moved = move_uploaded_file($_FILES['file']['tmp_name'], "img/" . $fname);
 
 		}
+}
+
+
+function ContinueShoot($uuid, $frames)
+{
+
+	global $bdd;
+
+
+	$q = $bdd->prepare("SELECT * FROM shoots WHERE uuid = :uuid AND active=1 LIMIT 1");
+	$q->bindValue(':uuid', $uuid);
+	$q->execute();
+
+	if($q->rowCount() > 0){
+	
+		while ($donnees = $q->fetch())
+		{
+			$title = $donnees['title'];
+			$frames_offset =  $donnees['uploaded_frames'];
+			$total_frames = $frames + $frames_offset;
+			//echo '{"status_code":1,"status":"Le shoot named : '.$title.' is created.", "title":"'.$title.'", "userFrame":1 ,"uuid":"'.$uuid.'"}';
+			if (moveImages($frames, $uuid, $frames_offset)){
+
+				$gif_frames = array();
+				$durations = array();
+				$img_suffixe="";
+
+				for ($i = 1; $i <= $total_frames; $i++) {
+					if($i == 1){
+						$thumbnail = $uuid."-".$i.$img_suffixe.".jpg";
+					}
+
+					array_push($gif_frames, "img/".$uuid."-".$i.".jpg");
+					array_push($durations, 20);
+				}
+
+				for ($i = $frames-1; $i > 1; $i--) {
+					array_push($gif_frames, "img/".$uuid."-".$i.".jpg");
+					array_push($durations, 20);
+				}
+
+				require "classes/AnimGif.php";
+				$anim = new GifCreator\AnimGif();
+				$anim->create($gif_frames, $durations);
+				$anim->save("img/".$uuid.".gif");
+
+				$req = $bdd->prepare('UPDATE shoots SET frames = :frames, uploaded_frames = :uploaded_frames WHERE uuid = :uuid');
+
+				if (!$req->execute(array(
+				'uploaded_frames' => $total_frames,
+				'frames' => $total_frames,
+				'uuid' => $uuid
+				))) {
+    					echo mysql_error();
+    			}else{
+
+    				echo '{"status_code":1,"status":"gif generated !", "gifUrl":"img/'.$uuid.'.gif", "title":"'.$title.'", "uuid":"'.$uuid.'"}';
+
+    			}
+
+				
+			}else{
+				echo '{"status_code":0,"status":"the shoot '.$uuid.' doesn\'t exist."}';
+			}
+		}
+
+	}
 }
 		
 ?>
