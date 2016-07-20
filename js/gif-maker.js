@@ -1219,6 +1219,7 @@
 
     var captureVideo;
     var captureStream;
+    var previousStreamId;
     //console.log(captureVideo);
     var getUserMediaSupport = false;
     var MediaStreamTrackSupport = false;
@@ -1361,7 +1362,7 @@
       }
       */
 
-      events.on('videoSourcesAvailable', startVideoStream);
+      //events.on('videoSourcesAvailable', startVideoStream);
 
       function startVideoStream(streamId) {
         
@@ -1370,6 +1371,12 @@
         if (typeof streamId === 'string' || streamId instanceof String)
         {
           log('with video sources…');
+
+          if(typeof localStorage!='undefined') {
+            localStorage.setItem('previousStreamId',streamId);
+          }
+
+
           var constraints = {
               audio: false,
               video: {
@@ -1391,7 +1398,6 @@
         }
 
         log('get user media…');
-        
         
         if(navigator.mediaDevices === undefined) {
           navigator.mediaDevices = {};
@@ -1425,6 +1431,16 @@
 
       function init(thisCaptureVideo) {
 
+        
+        
+        if(typeof localStorage!='undefined') {
+          // Récupération de la valeur dans web storage
+          //previousStreamId = localStorage.getItem('previousStreamId');
+          log('/////////////////////////'+localStorage.getItem('previousStreamId'));
+        } else {
+          log("localStorage not supported");
+        }
+        
         captureVideo = thisCaptureVideo;
 
         // enable getUserMedia
@@ -1455,7 +1471,10 @@
           }else{
             enumerateDevices().then(function(response) {
               //log(response);
+
               events.emit('videoSourcesAvailable', response);
+              startVideoStream(response[0].id);
+
             }).catch(function(err) {
               log(err.name + ': ' + err.message);
             });
@@ -1478,7 +1497,12 @@
             devices.forEach(function(device) {
               if(device.kind === 'videoinput'){
 
-                devicesList.push({label: device.label || 'Camera ' +i, id: device.deviceId}); 
+                if(typeof localStorage!='undefined' && device.deviceId==localStorage.getItem('previousStreamId') ) {
+                  //data.unshift( "B", "C" );
+                  devicesList.unshift({label: device.label || 'Camera ' +i, id: device.deviceId});
+                }else{
+                  devicesList.push({label: device.label || 'Camera ' +i, id: device.deviceId});
+                }
                 //log(device.kind + ': ' + device.label + ' id = ' + device.deviceId);
                 i++;
               }
@@ -1490,9 +1514,7 @@
             log(err.name + ': ' + err.message);
             reject;
           });
-
         });
-        
       }
 
 
@@ -1503,13 +1525,20 @@
         i = 1;
         sourceInfos.forEach(function(sourceInfo) {
           if(sourceInfo.kind === 'video'){
-            devicesList.push({label: sourceInfo.label || 'Camera ' +i, id: sourceInfo.id}); 
+
+            if(typeof localStorage!='undefined' && sourceInfo.id==localStorage.getItem('previousStreamId') ) {
+              //data.unshift( "B", "C" );
+              devicesList.unshift({label: sourceInfo.label || 'Camera ' +i, id: sourceInfo.id});
+            }else{
+              devicesList.push({label: sourceInfo.label || 'Camera ' +i, id: sourceInfo.id});
+            }
             //log(device.kind + ': ' + device.label + ' id = ' + device.deviceId);
             i++;
           }
         });
-
+        //log(devicesList[0].id);
         events.emit('videoSourcesAvailable', devicesList);
+        startVideoStream(devicesList[0].id);
           //console.log(devicesList);
           //resolve(devicesList);
       }
